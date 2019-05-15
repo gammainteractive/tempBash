@@ -7,8 +7,10 @@ using TMPro;
 public class UltraBar : MonoBehaviour {
 
     public TextMeshProUGUI ultraLevelText;
-    public Image ultraBar;
-    float startBarWidth;
+    public Image[] m_ultraBar;
+    public Color[] m_barColors;
+    public int m_ultraBarLevel = 0;
+    public int m_currentUltraBar = 0;
     string ultraTextFormat = "Lvl {0}";
     bool drainUltra;
     public float ultraDrainTime;
@@ -18,10 +20,12 @@ public class UltraBar : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        ultraBar.fillAmount = 0;
-        startBarWidth = ultraBar.rectTransform.sizeDelta.x;
+        foreach(Image _image in m_ultraBar)
+        {
+            _image.fillAmount = 0;
+        }
         //TryDrain();
-        UpdateUltraMeter(GameManager.instance.ultraLevel, GameManager.instance.MaxUltraLevel);
+        SetUltraLevelText(0);
     }
 
     // Update is called once per frame
@@ -31,7 +35,7 @@ public class UltraBar : MonoBehaviour {
             if (currentDrainTime > 0)
             {
                 currentDrainTime -= Time.deltaTime;
-                FillMeter(currentDrainTime / ultraDrainTime);
+                //FillMeter(currentDrainTime / ultraDrainTime);
             } else
             {
                 UltraEnded();
@@ -53,31 +57,101 @@ public class UltraBar : MonoBehaviour {
         drainUltra = true;
     }
 
-    public void UpdateUltraMeter(int ultraLevel, int maxLevel)
-    {
-        SetFillMeter(ultraLevel, maxLevel);
-        SetLevelText(ultraLevel);
-    }
-
-    void FillMeter(float ultraRatio)
+    /*void FillMeter(float ultraRatio)
     {
         Vector2 size = ultraBar.rectTransform.sizeDelta;
         ultraRatio *= (float) startDrainUltraLevel / GameManager.instance.MaxUltraLevel;
         size.x = ultraRatio * startBarWidth;
         ultraBar.rectTransform.sizeDelta = size;
+    }*/
+
+    public void SetUltraBarFill(float _fill)
+    {
+        m_ultraBar[m_currentUltraBar].fillAmount = _fill;
     }
 
-
-
-    void SetFillMeter(int ultraLevel, int maxLevel)
+   /*void SetFillMeter(int ultraLevel, int maxLevel)
     {
         Vector2 size = ultraBar.rectTransform.sizeDelta;
         float levelRatio = (float) ultraLevel / maxLevel;
         size.x = levelRatio * startBarWidth;
         ultraBar.rectTransform.sizeDelta = size;
+    }*/
+
+    public void AddUltraBar()
+    {
+        if (m_ultraBarLevel < m_barColors.Length - 1)
+        {
+            m_ultraBarLevel++;
+        } else
+        {
+            return;
+        }
+
+        ChangeBarColors(1);
+
+        SwitchUltraBar();
+
+        ChangeBarColors(0);
     }
 
-    void SetLevelText(int ultraLevel)
+    public void SwitchUltraBar()
+    {
+        m_ultraBar[m_currentUltraBar].transform.SetAsFirstSibling();
+        if (m_currentUltraBar == 0)
+        {
+            m_currentUltraBar = 1;
+        }
+        else
+        {
+            m_currentUltraBar = 0;
+        }
+    }
+
+    public void ReduceUltraBar()
+    {
+        if (m_ultraBarLevel == 0)
+        {
+            return;
+        }
+        Debug.Log("Reduce Ultra Bar");
+        m_ultraBarLevel--;
+        m_ultraBar[m_currentUltraBar].GetComponent<Image>().color = m_barColors[m_ultraBarLevel];
+
+        if (m_ultraBarLevel > 0)
+        {
+            if (m_currentUltraBar == 0)
+            {
+                m_ultraBar[1].GetComponent<Image>().color = m_barColors[m_ultraBarLevel - 1];
+            }
+            else
+            {
+                m_ultraBar[0].GetComponent<Image>().color = m_barColors[m_ultraBarLevel - 1];
+            }
+        }
+    }
+
+    void ChangeBarColors(int _index)
+    {
+        if(m_ultraBarLevel >= 2)
+        {
+            m_ultraBar[m_currentUltraBar].GetComponent<Image>().color = m_barColors[m_ultraBarLevel - _index];
+        }
+    }
+
+    public void ResetUltraBar()
+    {
+        m_currentUltraBar = 0;
+        m_ultraBarLevel = 0;
+        for(int i = 0; i <= 1; i++)
+        {
+            m_ultraBar[i].fillAmount = 0;
+            m_ultraBar[i].GetComponent<Image>().color = m_barColors[i];
+        }
+      //  ChangeBarColors();
+    }
+
+    public void SetUltraLevelText(int ultraLevel)
     {
         ultraLevelText.text = string.Format(ultraTextFormat, ultraLevel);
     }

@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour {
     public DamageText damageText;
     public TextMeshProUGUI gameOver;
     public GameObject restartButton;
+    public DamageModifierText m_damageModifier;
 
 	// Use this for initialization
 	void Start () {
@@ -61,8 +62,13 @@ public class UIManager : MonoBehaviour {
         }
         else
         {
-            UpdateUltraBar(0, GameManager.instance.MaxUltraLevel);
+            SetUltraLevelText(0);
         }
+    }
+
+    public void SetDamageModifier(float _modifier)
+    {
+        m_damageModifier.SetdamageModifierText(_modifier);
     }
 
     public void HitDamage(int damager)
@@ -111,9 +117,39 @@ public class UIManager : MonoBehaviour {
         ultraButton.ActivateArcadeButton(activate);
     }
 
-    public void UpdateUltraBar(int ultraLevel, int maxLevel)
+    public void SetUltraLevelText(int ultraLevel)
     {
-        ultraBar.UpdateUltraMeter(ultraLevel, maxLevel);
+        ultraBar.SetUltraLevelText(ultraLevel);
+    }
+
+    public void ResetUltraBar()
+    {
+        ultraBar.ResetUltraBar();
+    }
+
+    public void SwitchUltraBar()
+    {
+        ultraBar.SwitchUltraBar();
+    }
+
+    public void AddUltraBar()
+    {
+        ultraBar.AddUltraBar();
+    }
+
+    public void ReduceUltraBar()
+    {
+        ultraBar.ReduceUltraBar();
+    }
+
+    public void UpdateUltraFill(float _fill)
+    {
+        ultraBar.SetUltraBarFill(_fill);
+    }
+
+    public void ActivateDamageModifier(bool activate)
+    {
+        m_damageModifier.ActivateDamageModifierText(activate);
     }
 
     public void ActivateHitCombo(bool activate)

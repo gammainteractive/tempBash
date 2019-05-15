@@ -13,14 +13,10 @@ public class LivingBody : MonoBehaviour {
         currentHealth = maxHealth;
         myHealthBar.UpdateHealthBar(maxHealth, maxHealth);
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public virtual void TakeHit(int hitAmount = 1)
     {
+      
         currentHealth -= hitAmount;
         if (currentHealth <= 0) {
             if (tag == "Player")
@@ -28,7 +24,12 @@ public class LivingBody : MonoBehaviour {
             else GameManager.instance.GameOver(true);
         }
         currentHealth = Mathf.Max(currentHealth, 0);
-        Debug.Log(this.name + "Took {" + hitAmount + "} damage", this);
+        myHealthBar.UpdateHealthBar(currentHealth, maxHealth);
+    }
+
+    public virtual void AddHealth(int _health)
+    {
+        currentHealth = Mathf.Min(currentHealth + _health, maxHealth);
         myHealthBar.UpdateHealthBar(currentHealth, maxHealth);
     }
 }

@@ -24,20 +24,24 @@ public class GameManager : MonoBehaviour {
     Player player;
     Enemy enemy;
 
+    private float m_healthTimer = 1;
+    public float m_currentHealthTimer = 0;
+
     [Header("Combo Meter")]
     public int MinComboGain = 1;
     public int MaxComboGain = 3;
     public int currentComboLevel = 0;
-
+    public float m_comboDamageModifier = 0.1f;
 
     [Header("Ultra")]
-    public float ultraAmount;
+    public float ultraTotalAmount;
     public int ultraLevel;
     public int MaxUltraLevel = 4;
     public int InputsForUltraLevel = 6;
     public int numUltraHits;
     public float DrainTimePerUltraLevel = 1;
     public float UltraCoolDownTime = 10;
+    float m_ultraCurrentAmount = 0;
     [Space]
 
     [Header("Input Times")]
@@ -91,15 +95,29 @@ public class GameManager : MonoBehaviour {
             if (currentInputTime > 0)
             {
                 currentInputTime -= Time.deltaTime;
-
             }
             else
             {
                 uiManager.ActivateTimerBar(true);
                 MissedInput();
             }
+
         }
-	}
+
+        if (dangerMode)
+        {
+            m_currentHealthTimer += Time.deltaTime;
+            if (m_currentHealthTimer >= m_healthTimer)
+            {
+                m_currentHealthTimer = 0;
+                player.AddHealth(10);
+                if (player.currentHealth >= 100)
+                {
+                    dangerMode = false;
+                }
+            }
+        }
+    }
 
     void StartGame()
     {
@@ -170,19 +188,36 @@ public class GameManager : MonoBehaviour {
     
     void MissedInput()
     {
+        player.TakeHit(50);
+
         if (dangerMode)
         {
             GameOver(false); return;
         }
+
         uiManager.SetReadyInteractable(false);
         uiManager.SetReadyCooldown();
         uiManager.ActivateHitCombo(false);
+        uiManager.ActivateDamageModifier(false);
         uiManager.UpdateHitCombo(1);
         currentComboLevel = 0;
         //promptDelay = StartPromptDelay;
         StartPattern(startNumPatterns, true);
         currentNumPatterns = startNumPatterns;
-        ultraAmount = Mathf.Max(ultraAmount - 1, 0);
+    
+        if (ultraTotalAmount >= 1)
+        {
+            uiManager.UpdateUltraFill(0);
+            uiManager.SwitchUltraBar();
+            uiManager.ReduceUltraBar();
+            uiManager.UpdateUltraFill(m_ultraCurrentAmount);
+        } else
+        {
+            m_ultraCurrentAmount = 0;
+            uiManager.UpdateUltraFill(0);
+        }
+
+        ultraTotalAmount = Mathf.Max(ultraTotalAmount - 1, 0);
         dangerMode = true;
         //uiManager.SetReadyInteractable(false);
         //uiManager.SetReadyCooldown();
@@ -195,7 +230,7 @@ public class GameManager : MonoBehaviour {
         {
             uiManager.ReadyUltraButton(false);
         }
-        uiManager.UpdateUltraBar(ultraLevel, MaxUltraLevel);
+        uiManager.SetUltraLevelText(ultraLevel);
     }
 
     void StopPlayerInput()
@@ -246,7 +281,6 @@ public class GameManager : MonoBehaviour {
 
                 float ultraMultiplier = (float)1 / InputsForUltraLevel;
                 float ultraGained = (currentInputTime / inputTimePerPrompt) * ultraMultiplier;
-                print("UltraGained: " + ultraGained);
                 AddUltra(ultraGained);
 
                 if (currentInputNum >= currentNumPatterns)
@@ -295,11 +329,24 @@ public class GameManager : MonoBehaviour {
     {
         if (ultraLevel >= MaxUltraLevel) return;
 
-        ultraAmount += amount;
-        ultraAmount = Mathf.Min(ultraAmount, 4);
+        ultraTotalAmount += amount;
+        ultraTotalAmount = Mathf.Min(ultraTotalAmount, 4);
+        m_ultraCurrentAmount += amount;
 
-        ultraLevel = Mathf.FloorToInt(ultraAmount);
-        uiManager.UpdateUltraBar(ultraLevel, MaxUltraLevel);
+        if (m_ultraCurrentAmount >= 1)
+        {
+           
+            ultraLevel++;
+            uiManager.SetUltraLevelText(ultraLevel);
+            uiManager.UpdateUltraFill(1);
+            uiManager.AddUltraBar();
+            uiManager.UpdateUltraFill(m_ultraCurrentAmount - 1);
+            Debug.Log("ultraCurrentAmount : " + m_ultraCurrentAmount);
+            m_ultraCurrentAmount -= 1;
+        } else
+        {
+            uiManager.UpdateUltraFill(m_ultraCurrentAmount);
+        }
 
         if (ultraLevel >= 1)
         {
@@ -322,11 +369,12 @@ public class GameManager : MonoBehaviour {
 
     public void UltraEnded()
     {
-        ultraAmount = 0;
+        ultraTotalAmount = 0;
         ultraLevel = 0;
         uiManager.UltraMode(false);
         uiManager.SetReadyInteractable(false);
         uiManager.SetReadyCooldown();
+        uiManager.ResetUltraBar();
         int totalDamage = ComboMultiplier() * numUltraHits;
         enemy.TakeHit(totalDamage);
         uiManager.SetDamageText(ComboMultiplier(), numUltraHits, totalDamage);
@@ -345,7 +393,15 @@ public class GameManager : MonoBehaviour {
     {
         int comboGained = Mathf.RoundToInt(Mathf.Lerp(MinComboGain, MaxComboGain, timeRatio));
         print("Combo Gained -- " + comboGained);
-        currentComboLevel += comboGained;
+        //currentComboLevel += comboGained;
+
+        currentComboLevel += 1;
+        SetDamageModifier(currentComboLevel);
+    }
+
+    void SetDamageModifier(int _currentComboLevel){
+        float m_damageModifier = 1 + (_currentComboLevel * m_comboDamageModifier);
+        uiManager.SetDamageModifier(m_damageModifier);
     }
 
     void UpdateInputTime()

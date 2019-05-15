@@ -15,11 +15,6 @@ public class DamageText : MonoBehaviour {
         DeActivateDamageText();
 
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public void SetDamageText(int comboHits, int ultraHits, int totalDamage)
     {
