@@ -1,0 +1,25 @@
+{
+
+  "MinComboGain": 1,
+  "MaxComboGain": 5,
+
+  "MaxUltraLevel": 2,
+  "InputsForUltraLevel": 5,
+  "DrainTimePerUltraLevel": 1,
+  "UltraCoolDownTime": 10,
+
+  "RampInputTimes": false,
+  "StartInputTime": 1,
+  "MinInputTime": 0.65,
+  "InputsForMinInputTime": 45,
+
+  "RampPromptDelays": true,
+  "StartPromptDelay": 1.0,
+  "MinPromptDelay": 0.4,
+  "InputsForMinPromptTime": 45,
+
+  "ButtonAlertTime": 0.3,
+  "MaxEnemyHealth": 5000,
+
+  "PromptToInputDelay": 1.0
+}
