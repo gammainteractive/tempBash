@@ -6,8 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour {
 
     public static GameManager instance;
-
-    public bool startGame;
+    
     public bool dangerMode;
     public enum GameState { DisplayPattern, PlayerInput, UltraMode, GameOver}
     public GameState currentState;
@@ -20,12 +19,23 @@ public class GameManager : MonoBehaviour {
 
     public int MaxEnemyHealth;
     public int currentInputNum;
-    UIManager uiManager;
-    Player player;
-    Enemy enemy;
+    public UIManager uiManager;
+    public Player player;
+    public Enemy enemy;
 
     private float m_healthTimer = 1;
     public float m_currentHealthTimer = 0;
+
+    public enum GAME_MODES
+    {
+        MEMORY,
+        REACTION
+    }
+
+    [Header("Game Mode Parameters")]
+    public int m_GameMode = 0;
+    public int m_CurrentNumberOfMiss = 0;
+    public int m_MaxNumberOfMiss = 2;
 
     [Header("Combo Meter")]
     public int MinComboGain = 1;
@@ -41,7 +51,7 @@ public class GameManager : MonoBehaviour {
     public int numUltraHits;
     public float DrainTimePerUltraLevel = 1;
     public float UltraCoolDownTime = 10;
-    float m_ultraCurrentAmount = 0;
+    public float m_ultraCurrentAmount = 0;
     [Space]
 
     [Header("Input Times")]
@@ -55,6 +65,7 @@ public class GameManager : MonoBehaviour {
     [Space]
 
     [Header("Prompt Times")]
+    public float m_displayPatternDelay = 0.5f;
     public bool RampPromptDelays = true;
     public float StartPromptDelay = 1;
     public float promptDelay;
@@ -71,16 +82,15 @@ public class GameManager : MonoBehaviour {
     void Awake()
     {
         instance = this;
-        uiManager = FindObjectOfType<UIManager>();
-        player = FindObjectOfType<Player>();
-        enemy = FindObjectOfType<Enemy>();
     }
 
 
     // Use this for initialization
     void Start () {
+
+        uiManager.TitleView();
         currentNumPatterns = startNumPatterns;
-        if (startGame) StartGame();
+       
         inputTimePerPrompt = StartInputTime;
         promptDelay = StartPromptDelay;
         inputTimeDelta = (StartInputTime - MinInputTime) / InputsForMinInputTime;
@@ -90,6 +100,7 @@ public class GameManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (Input.GetKeyDown(KeyCode.F)) StopCoroutine(patternRoutine);
+
         if (currentState == GameState.PlayerInput)
         {
             if (currentInputTime > 0)
@@ -104,7 +115,7 @@ public class GameManager : MonoBehaviour {
 
         }
 
-        if (dangerMode)
+        if (dangerMode && m_GameMode == (int)GAME_MODES.MEMORY)
         {
             m_currentHealthTimer += Time.deltaTime;
             if (m_currentHealthTimer >= m_healthTimer)
@@ -119,19 +130,69 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void StartGame()
+    void SetGameModeParameters(GAME_MODES _mode)
     {
-        StartPattern(startNumPatterns, true);
+        switch (_mode)
+        {
+            case GAME_MODES.MEMORY:
+                m_GameMode = (int)GAME_MODES.MEMORY;
+                m_MaxNumberOfMiss = 2;
+                SetEnemyDamage(50);
+            break;
+
+            case GAME_MODES.REACTION:
+                Debug.Log("Reaction Game");
+                m_GameMode = (int)GAME_MODES.REACTION;
+                m_MaxNumberOfMiss = 5;
+                SetEnemyDamage(20);
+                //This is the delay after showing the pattern to press
+                PromptToInputDelay /= 2.5f;
+                //This is the delay after "Watch"
+                m_displayPatternDelay = 0.20f;
+                //Delay after while showing watch
+                promptDelay = 0.15f;    //Default 1
+                //Delay on how long the pattern lights up (3 buttons) - Default .3
+                ButtonAlertTime = 0.15f;
+            break;
+        }
+    }
+
+    void SetEnemyDamage(int _damage)
+    {
+        enemy.m_damage = _damage;
+    }
+
+    public void StartGame(int _gameMode)
+    {
+        switch (_gameMode)
+        {
+            case (int)GAME_MODES.MEMORY:
+                SetGameModeParameters(GAME_MODES.MEMORY);
+                StartPattern(startNumPatterns, true);
+            break;
+
+            case (int)GAME_MODES.REACTION:
+                SetGameModeParameters(GAME_MODES.REACTION);
+                StartPattern(startNumPatterns, true);
+                break;
+
+        }
+        
+    }
+
+    void ResetGameParameters()
+    {
+        currentInputNum = 0;
+        ResetInputTimer();
     }
     
     void StartPattern(int numPatterns, bool newPattern = false)
     {
         if (currentState == GameState.GameOver) return;
         SetButtonsInteractable(false);
-        currentInputNum = 0;
+        ResetGameParameters();
         currentNumPatterns = numPatterns;
         patternRoutine = StartCoroutine(PlaySimonPattern(numPatterns));
-        ResetInputTimer();
         if (newPattern)
         {
             SetButtonPattern();
@@ -150,7 +211,7 @@ public class GameManager : MonoBehaviour {
         uiManager.ActivatePromptText(true);
         uiManager.PromptPrompt(true);
         if (inputRoutine != null) StopCoroutine(inputRoutine);
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(m_displayPatternDelay);
         for (int i = 0; i < numPatterns; ++i)
         {
             currentButtonPattern[i].SimonAlert();
@@ -188,9 +249,9 @@ public class GameManager : MonoBehaviour {
     
     void MissedInput()
     {
-        player.TakeHit(50);
+        player.TakeHit(enemy.m_damage);
 
-        if (dangerMode)
+        if (dangerMode || player.currentHealth <= 0)
         {
             GameOver(false); return;
         }
@@ -218,7 +279,12 @@ public class GameManager : MonoBehaviour {
         }
 
         ultraTotalAmount = Mathf.Max(ultraTotalAmount - 1, 0);
-        dangerMode = true;
+
+        if (m_GameMode == (int)GAME_MODES.MEMORY)
+        {
+            dangerMode = true;
+        }
+
         //uiManager.SetReadyInteractable(false);
         //uiManager.SetReadyCooldown();
         if (ultraLevel > 0) ultraLevel--;
@@ -288,7 +354,14 @@ public class GameManager : MonoBehaviour {
                     // Correctly entered Sequence
                     UpdateInputTime();
                     UpdatePromptDelay();
-                    StartPattern(currentNumPatterns + 1);
+                    if (m_GameMode == (int)GAME_MODES.MEMORY)
+                    {
+                        StartPattern(currentNumPatterns + 1);
+                    } else
+                    {
+                        SetButtonPattern();
+                        StartPattern(startNumPatterns);
+                    }
                     uiManager.ActivateTimerBar(false);
                 } else
                 {
@@ -335,14 +408,21 @@ public class GameManager : MonoBehaviour {
 
         if (m_ultraCurrentAmount >= 1)
         {
-           
             ultraLevel++;
             uiManager.SetUltraLevelText(ultraLevel);
-            uiManager.UpdateUltraFill(1);
-            uiManager.AddUltraBar();
-            uiManager.UpdateUltraFill(m_ultraCurrentAmount - 1);
-            Debug.Log("ultraCurrentAmount : " + m_ultraCurrentAmount);
-            m_ultraCurrentAmount -= 1;
+            if (ultraLevel >= MaxUltraLevel)
+            {
+                uiManager.UpdateUltraFill(1);
+            }
+            else
+            {
+                uiManager.UpdateUltraFill(1);
+                uiManager.AddUltraBar();
+                uiManager.UpdateUltraFill(m_ultraCurrentAmount - 1);
+                Debug.Log("ultraCurrentAmount : " + m_ultraCurrentAmount);
+                m_ultraCurrentAmount -= 1;
+            }
+            
         } else
         {
             uiManager.UpdateUltraFill(m_ultraCurrentAmount);

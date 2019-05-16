@@ -5,13 +5,12 @@ using UnityEngine.UI;
 
 public class TimerBar : MonoBehaviour {
     
-    Image fillBar;
+    public Image fillBar;
     public bool updateBar;
     GameManager gameManager;
 
 	// Use this for initialization
 	void Awake () {
-        fillBar = GetComponentInChildren<Image>();
         gameManager = GameManager.instance;
     }
 	

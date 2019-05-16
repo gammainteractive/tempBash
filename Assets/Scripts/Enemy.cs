@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Enemy : LivingBody {
 
+    public int m_damage = 50;
+
     private void Awake()
     {
     }

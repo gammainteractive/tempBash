@@ -5,6 +5,13 @@ using TMPro;
 
 public class UIManager : MonoBehaviour {
 
+    public Transform[] UiViews;
+    public enum UI_VIEW
+    {
+        TITLE_SCREEN,
+        GAME_VIEW
+    }
+
     public TextMeshProUGUI newPatternText;
     public TimerBar timerBar;
     public HealthBar playerHealth;
@@ -29,6 +36,18 @@ public class UIManager : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public void TitleView()
+    {
+        UiViews[(int)UI_VIEW.GAME_VIEW].gameObject.SetActive(false);
+        UiViews[(int)UI_VIEW.TITLE_SCREEN].gameObject.SetActive(true);
+    }
+
+    public void GameView()
+    {
+        UiViews[(int)UI_VIEW.GAME_VIEW].gameObject.SetActive(true);
+        UiViews[(int)UI_VIEW.TITLE_SCREEN].gameObject.SetActive(false);
+    }
 
     public void HitEnemy()
     {
