@@ -30,7 +30,7 @@ public class HealthBar : MonoBehaviour
         UpdateHealthText(currentHealth);
     }
 
-    void UpdateHealthText(float health)
+    public void UpdateHealthText(float health)
     {
         healthText.text = string.Format(healthTextFormat, health);
     }

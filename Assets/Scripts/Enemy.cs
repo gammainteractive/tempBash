@@ -11,10 +11,7 @@ public class Enemy : LivingBody {
     }
     // Use this for initialization
     protected override void Start () {
-        maxHealth = GameManager.instance.MaxEnemyHealth;
         base.Start();
-
-        
     }
 
     // Update is called once per frame

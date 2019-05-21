@@ -21,14 +21,13 @@ public class UIManager : MonoBehaviour {
     public UltraButton ultraButton;
     public WatchPrompt promptText;
     public DamageText damageText;
-    public TextMeshProUGUI gameOver;
+    public GameObject gameOver;
     public GameObject restartButton;
     public DamageModifierText m_damageModifier;
 
 	// Use this for initialization
 	void Start () {
         ActivateTimerBar(false);
-        gameOver.enabled = false;
         restartButton.SetActive(false);
     }
 	
@@ -54,18 +53,29 @@ public class UIManager : MonoBehaviour {
         //enemyHealth.TakeHit();
     }
 
+    public void UpdatePlayerHealthText(float _value)
+    {
+        playerHealth.UpdateHealthText(_value);
+    }
+
+    public void UpdateEnemyHealthText(float _value)
+    {
+        enemyHealth.UpdateHealthText(_value);
+    }
+
     public void SetGameOver(bool winner)
     {
+        
         if (winner)
         {
-            gameOver.text = "Game Over\n<color=yellow>You Win";
+            gameOver.GetComponentInChildren<TextMeshProUGUI>(true).text = "Game Over\n<color=yellow>You Win";
         }
         else
         {
-            gameOver.text = "Game Over\nYou Lose";
+            gameOver.GetComponentInChildren<TextMeshProUGUI>(true).text = "Game Over\nYou Lose";
             playerHealth.UpdateHealthBar(0, 100);
         }
-        gameOver.enabled = true;
+        gameOver.SetActive(true);
         restartButton.SetActive(true);
         ActivatePromptText(false);
     }

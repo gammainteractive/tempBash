@@ -19,12 +19,14 @@ public class GameManager : MonoBehaviour {
 
     public int MaxEnemyHealth;
     public int currentInputNum;
+    public SoundManager m_soundManager;
     public UIManager uiManager;
     public Player player;
     public Enemy enemy;
 
     private float m_healthTimer = 1;
     public float m_currentHealthTimer = 0;
+    public GameObject m_stage;
 
     public enum GAME_MODES
     {
@@ -115,7 +117,8 @@ public class GameManager : MonoBehaviour {
 
         }
 
-        if (dangerMode && m_GameMode == (int)GAME_MODES.MEMORY)
+        if (dangerMode && m_GameMode == (int)GAME_MODES.MEMORY
+            && currentState != GameState.GameOver)
         {
             m_currentHealthTimer += Time.deltaTime;
             if (m_currentHealthTimer >= m_healthTimer)
@@ -130,6 +133,18 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    private void SetEnemyHealth(int _value)
+    {
+        enemy.SetHealth(_value);
+        uiManager.UpdateEnemyHealthText(_value);
+    }
+
+    private void SetPlayerHealth(int _value)
+    {
+        player.SetHealth(_value);
+        uiManager.UpdatePlayerHealthText(_value);
+    }
+
     void SetGameModeParameters(GAME_MODES _mode)
     {
         switch (_mode)
@@ -137,13 +152,18 @@ public class GameManager : MonoBehaviour {
             case GAME_MODES.MEMORY:
                 m_GameMode = (int)GAME_MODES.MEMORY;
                 m_MaxNumberOfMiss = 2;
+                SetPlayerHealth(100);
+                SetEnemyHealth(100);
                 SetEnemyDamage(50);
+
             break;
 
             case GAME_MODES.REACTION:
                 Debug.Log("Reaction Game");
                 m_GameMode = (int)GAME_MODES.REACTION;
                 m_MaxNumberOfMiss = 5;
+                SetPlayerHealth(100);
+                SetEnemyHealth(300);
                 SetEnemyDamage(20);
                 //This is the delay after showing the pattern to press
                 PromptToInputDelay /= 2.5f;
@@ -164,6 +184,8 @@ public class GameManager : MonoBehaviour {
 
     public void StartGame(int _gameMode)
     {
+        m_soundManager.StopMusic();
+        m_stage.SetActive(true);
         switch (_gameMode)
         {
             case (int)GAME_MODES.MEMORY:

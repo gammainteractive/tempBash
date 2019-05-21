@@ -1,0 +1,41 @@
+{ "frames": {
+   "idle N 0.ase": {
+    "frame": { "x": 0, "y": 0, "w": 61, "h": 64 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 61, "h": 64 },
+    "sourceSize": { "w": 63, "h": 64 },
+    "duration": 200
+   },
+   "idle N 1.ase": {
+    "frame": { "x": 61, "y": 0, "w": 62, "h": 60 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 4, "w": 62, "h": 60 },
+    "sourceSize": { "w": 63, "h": 64 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.11-x64",
+  "image": "idle N.png",
+  "format": "RGBA8888",
+  "size": { "w": 126, "h": 64 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "tail", "opacity": 255, "blendMode": "normal" },
+   { "name": "body", "opacity": 255, "blendMode": "normal" },
+   { "name": "head", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 2", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 2 Copy", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 4", "opacity": 255, "blendMode": "normal" },
+   { "name": "mouth", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

@@ -1,0 +1,70 @@
+{ "frames": {
+   "raccoon kick 0.ase": {
+    "frame": { "x": 0, "y": 0, "w": 65, "h": 52 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 21, "w": 65, "h": 52 },
+    "sourceSize": { "w": 100, "h": 73 },
+    "duration": 100
+   },
+   "raccoon kick 1.ase": {
+    "frame": { "x": 65, "y": 0, "w": 59, "h": 56 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 17, "w": 59, "h": 56 },
+    "sourceSize": { "w": 100, "h": 73 },
+    "duration": 100
+   },
+   "raccoon kick 2.ase": {
+    "frame": { "x": 124, "y": 0, "w": 95, "h": 57 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 5, "y": 16, "w": 95, "h": 57 },
+    "sourceSize": { "w": 100, "h": 73 },
+    "duration": 100
+   },
+   "raccoon kick 3.ase": {
+    "frame": { "x": 219, "y": 0, "w": 79, "h": 57 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 4, "y": 16, "w": 79, "h": 57 },
+    "sourceSize": { "w": 100, "h": 73 },
+    "duration": 100
+   },
+   "raccoon kick 4.ase": {
+    "frame": { "x": 298, "y": 0, "w": 59, "h": 56 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 17, "w": 59, "h": 56 },
+    "sourceSize": { "w": 100, "h": 73 },
+    "duration": 100
+   },
+   "raccoon kick 5.ase": {
+    "frame": { "x": 357, "y": 0, "w": 60, "h": 51 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 22, "w": 60, "h": 51 },
+    "sourceSize": { "w": 100, "h": 73 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.11-x64",
+  "image": "Light_Kick.png",
+  "format": "RGBA8888",
+  "size": { "w": 600, "h": 73 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "tail", "opacity": 255, "blendMode": "normal" },
+   { "name": "legs", "opacity": 255, "blendMode": "normal" },
+   { "name": "body", "opacity": 255, "blendMode": "normal" },
+   { "name": "head", "opacity": 255, "blendMode": "normal" },
+   { "name": "hands", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

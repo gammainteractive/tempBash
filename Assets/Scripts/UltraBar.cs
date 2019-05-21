@@ -30,7 +30,8 @@ public class UltraBar : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (drainUltra)
+        if (drainUltra 
+            && GameManager.instance.currentState != GameManager.GameState.GameOver)
         {
             if (currentDrainTime > 0)
             {

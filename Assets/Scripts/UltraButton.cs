@@ -36,7 +36,8 @@ public class UltraButton : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (coolDown)
+        if (coolDown
+            && GameManager.instance.currentState != GameManager.GameState.GameOver)
         {
             if (currentTime < GameManager.instance.UltraCoolDownTime)
             {

@@ -1,0 +1,74 @@
+{ "frames": {
+   "raccoon pound2 0.ase": {
+    "frame": { "x": 0, "y": 0, "w": 76, "h": 61 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 61 },
+    "sourceSize": { "w": 76, "h": 61 },
+    "duration": 100
+   },
+   "raccoon pound2 1.ase": {
+    "frame": { "x": 76, "y": 0, "w": 76, "h": 61 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 61 },
+    "sourceSize": { "w": 76, "h": 61 },
+    "duration": 100
+   },
+   "raccoon pound2 2.ase": {
+    "frame": { "x": 152, "y": 0, "w": 76, "h": 61 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 61 },
+    "sourceSize": { "w": 76, "h": 61 },
+    "duration": 100
+   },
+   "raccoon pound2 3.ase": {
+    "frame": { "x": 228, "y": 0, "w": 76, "h": 61 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 61 },
+    "sourceSize": { "w": 76, "h": 61 },
+    "duration": 100
+   },
+   "raccoon pound2 4.ase": {
+    "frame": { "x": 304, "y": 0, "w": 76, "h": 61 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 61 },
+    "sourceSize": { "w": 76, "h": 61 },
+    "duration": 100
+   },
+   "raccoon pound2 5.ase": {
+    "frame": { "x": 380, "y": 0, "w": 76, "h": 61 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 61 },
+    "sourceSize": { "w": 76, "h": 61 },
+    "duration": 100
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.11-x64",
+  "image": "Medium_Punch.png",
+  "format": "RGBA8888",
+  "size": { "w": 456, "h": 61 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "tail", "opacity": 255, "blendMode": "normal" },
+   { "name": "hand2", "opacity": 255, "blendMode": "normal" },
+   { "name": "body", "opacity": 255, "blendMode": "normal" },
+   { "name": "hands", "opacity": 255, "blendMode": "normal" },
+   { "name": "hands2", "opacity": 255, "blendMode": "normal" },
+   { "name": "head", "opacity": 255, "blendMode": "normal" },
+   { "name": "HAAA", "opacity": 255, "blendMode": "normal" },
+   { "name": "yail2", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

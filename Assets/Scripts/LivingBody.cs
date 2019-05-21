@@ -14,6 +14,12 @@ public class LivingBody : MonoBehaviour {
         myHealthBar.UpdateHealthBar(maxHealth, maxHealth);
     }
 
+    public void SetHealth(int _value)
+    {
+        maxHealth = _value;
+        Start();
+    }
+
     public virtual void TakeHit(int hitAmount = 1)
     {
       
