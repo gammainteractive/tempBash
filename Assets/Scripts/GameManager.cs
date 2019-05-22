@@ -21,8 +21,10 @@ public class GameManager : MonoBehaviour {
     public int currentInputNum;
     public SoundManager m_soundManager;
     public UIManager uiManager;
+    public CameraManager m_cameraManager;
     public Player player;
     public Enemy enemy;
+    public AnimationManager m_animationManager;
 
     private float m_healthTimer = 1;
     public float m_currentHealthTimer = 0;
@@ -360,11 +362,20 @@ public class GameManager : MonoBehaviour {
             if (correct)
             {
                 // Hit Correct Button
+                m_animationManager.PlayRandomQueued();
                 enemy.TakeHit(ComboMultiplier());
                 uiManager.HitDamage(ComboMultiplier());
                 currentInputNum++;
                 GainCombo(currentInputTime/inputTimePerPrompt);
-                if (currentComboLevel >= 3) uiManager.ActivateHitCombo(true);
+                if (currentComboLevel >= 3)
+                {
+                    uiManager.ActivateHitCombo(true);
+                }
+                if(currentInputNum > 3 
+                    && currentComboLevel > 3)
+                {
+                    m_cameraManager.ZoomIn();
+                }
                 uiManager.UpdateHitCombo(currentComboLevel);
 
                 float ultraMultiplier = (float)1 / InputsForUltraLevel;
@@ -374,6 +385,7 @@ public class GameManager : MonoBehaviour {
                 if (currentInputNum >= currentNumPatterns)
                 {
                     // Correctly entered Sequence
+                    m_cameraManager.ZoomOut();
                     UpdateInputTime();
                     UpdatePromptDelay();
                     if (m_GameMode == (int)GAME_MODES.MEMORY)
@@ -522,6 +534,7 @@ public class GameManager : MonoBehaviour {
 
     public void GameOver(bool win)
     {
+        m_cameraManager.ZoomOut();
         currentState = GameState.GameOver;
         uiManager.SetGameOver(win);
         StopPlayerInput();
