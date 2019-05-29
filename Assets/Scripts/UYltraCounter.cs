@@ -15,6 +15,6 @@ public class UYltraCounter : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        counter.text = GameManager.instance.numUltraHits.ToString() ;
+        counter.text = GameManager.instance.numUltraHits.ToString() + " Hits!!";
 	}
 }

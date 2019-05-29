@@ -36,7 +36,7 @@ public class UltraBar : MonoBehaviour {
             if (currentDrainTime > 0)
             {
                 currentDrainTime -= Time.deltaTime;
-                //FillMeter(currentDrainTime / ultraDrainTime);
+                SetUltraBarFill(currentDrainTime / ultraDrainTime);
             } else
             {
                 UltraEnded();
@@ -55,6 +55,7 @@ public class UltraBar : MonoBehaviour {
         startDrainUltraLevel = GameManager.instance.ultraLevel;
         ultraDrainTime = (float) startDrainUltraLevel * GameManager.instance.DrainTimePerUltraLevel;
         currentDrainTime = ultraDrainTime;
+        Debug.Log("Ultra drain");
         drainUltra = true;
     }
 

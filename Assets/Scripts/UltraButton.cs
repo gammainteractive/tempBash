@@ -6,69 +6,95 @@ using TMPro;
 
 public class UltraButton : MonoBehaviour
 {
-    public GameObject arcadeButton;
-    public GameObject readyButtonGO;
-    Image readyButtonImage;
-    public Color buttonColor;
-    Button readyButton;
+    public GameObject m_ultraGO;
+    Button m_ultraButton;
     TextMeshProUGUI ultraText;
-    bool coolDown;
+
+    public GameObject m_ultraFillGO;
+    Image m_ultraFillImage;
+    Button m_ultraFillButton;
+   
+
+    public bool coolDown;
     public float ultraCooldownTime;
     float currentTime;
+
+    public bool m_startCooldown = false;
 
     // Use this for initialization
     void Awake()
     {
-        readyButtonImage = readyButtonGO.GetComponentInChildren<Image>();
-        buttonColor = readyButtonImage.color;
-        readyButton = readyButtonGO.GetComponent<Button>();
-        ultraText = GetComponentInChildren<TextMeshProUGUI>();
-        readyButtonImage.fillAmount = 1;
-        SetReadyInteractable(false);
+        m_ultraFillImage = m_ultraFillGO.GetComponentInChildren<Image>();
+        m_ultraFillButton = m_ultraFillGO.GetComponent<Button>();
+
+        m_ultraButton = m_ultraGO.GetComponent<Button>();
+
+        ultraText = m_ultraFillGO.GetComponentInChildren<TextMeshProUGUI>();
+        m_ultraFillImage.fillAmount = 0;
+        SetUltraButtonInteractable(false);
     }
 
     private void Start()
     {
-        ActivateArcadeButton(false);
-        ReadyUltraButton(false);
+        SetUltraButtonInteractable(false);
+        UltraTextSetActive(false);
+        GameManager.instance.StartGameHandle += () => {
+            StartUltraCooldown();
+        };
+        GameManager.instance.EndGameHandle += () =>
+        {
+            StopUltraCooldown();
+        };
+    }
+
+    private void OnEnable()
+    {
+        StartUltraCooldown();
+    }
+
+    public void StartUltraCooldown()
+    {
+        Debug.Log("Start ultra cooldown");
+        CoolDown();
+        m_startCooldown = true;
+    }
+
+    private void StopUltraCooldown()
+    {
+        m_startCooldown = false;
     }
 
     // Update is called once per frame
     void Update()
     {
         if (coolDown
-            && GameManager.instance.currentState != GameManager.GameState.GameOver)
+            && GameManager.instance.currentState != GameManager.GameState.GameOver
+            && m_startCooldown)
         {
+            Debug.Log("running");
             if (currentTime < GameManager.instance.UltraCoolDownTime)
             {
                 currentTime += Time.deltaTime;
-                readyButtonImage.fillAmount = currentTime / GameManager.instance.UltraCoolDownTime;
+                m_ultraFillImage.fillAmount = currentTime / GameManager.instance.UltraCoolDownTime;
             }
             else
             {
                 coolDown = false;
-                readyButtonImage.fillAmount = 1;
-                readyButton.interactable = true;
+                m_ultraFillImage.fillAmount = 1;
+                m_ultraFillButton.interactable = true;
                 GameManager.instance.dangerMode = false;
             }
         }
     }
 
-    public void ReadyUltraButton(bool active)
+    public void UltraTextSetActive(bool active)
     {
-        readyButtonImage.color = active ? buttonColor : Color.white;
-        //readyButton.enabled = active;
         ultraText.enabled = active;
     }
 
-    public void HitReadyButton()
+    public void HitUltraButton()
     {
-        GameManager.instance.UltraReadyButtonHit();
-    }
-
-    public void HitArcadeButton()
-    {
-        GameManager.instance.UltraArcadeButtonHit();
+        GameManager.instance.UltraButtonHit();
     }
 
     public void CoolDown()
@@ -77,22 +103,9 @@ public class UltraButton : MonoBehaviour
         currentTime = 0;
     }
 
-    public void SetReadyInteractable(bool interact)
+    public void SetUltraButtonInteractable(bool interact)
     {
-        readyButton.interactable = interact;
+        m_ultraFillButton.interactable = interact;
     }
-    
-
-    public void ActivateArcadeButton(bool active)
-    {
-        arcadeButton.SetActive(active);
-
-    }
-
-    public void ActivateReadyButton(bool active)
-    {
-        readyButtonGO.SetActive(active);
-    }
-
 
 }

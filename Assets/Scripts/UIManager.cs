@@ -5,6 +5,8 @@ using TMPro;
 
 public class UIManager : MonoBehaviour {
 
+    public static UIManager Instance;
+
     public Transform[] UiViews;
     public enum UI_VIEW
     {
@@ -25,8 +27,13 @@ public class UIManager : MonoBehaviour {
     public GameObject restartButton;
     public DamageModifierText m_damageModifier;
 
-	// Use this for initialization
-	void Start () {
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    // Use this for initialization
+    void Start () {
         ActivateTimerBar(false);
         restartButton.SetActive(false);
     }
@@ -82,9 +89,7 @@ public class UIManager : MonoBehaviour {
 
     public void UltraMode(bool modeOn)
     {
-        ActivateUltraArcadeButton(modeOn);
-        ActivateUltraReadyButton(!modeOn);
-        if (!modeOn)ReadyUltraButton(false);
+        UltraTextSetActive(modeOn);
         if (modeOn)
         {
             ultraBar.DrainUltraBar();
@@ -126,24 +131,14 @@ public class UIManager : MonoBehaviour {
         ultraButton.CoolDown();
     }
 
-    public void SetReadyInteractable(bool interactable)
+    public void SetUltraButtonInteractable(bool interactable)
     {
-        ultraButton.SetReadyInteractable(interactable);
+        ultraButton.SetUltraButtonInteractable(interactable);
     }
 
-    public void ActivateUltraReadyButton(bool activate)
+    public void UltraTextSetActive(bool ready)
     {
-        ultraButton.ActivateReadyButton(activate);
-    }
-
-    public void ReadyUltraButton(bool ready)
-    {
-        ultraButton.ReadyUltraButton(ready);
-    }
-
-    public void ActivateUltraArcadeButton(bool activate)
-    {
-        ultraButton.ActivateArcadeButton(activate);
+        ultraButton.UltraTextSetActive(ready);
     }
 
     public void SetUltraLevelText(int ultraLevel)

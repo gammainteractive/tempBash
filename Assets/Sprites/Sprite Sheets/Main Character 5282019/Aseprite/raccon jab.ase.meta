@@ -1,0 +1,37 @@
+fileFormatVersion: 2
+guid: 01b850e9e2c2b044aaf912142af9539d
+ScriptedImporter:
+  fileIDToRecycleName:
+    2800000: Texture
+    21300000: raccon jab_0
+    21300002: raccon jab_1
+    21300004: raccon jab_2
+    21300006: raccon jab_3
+    21300008: raccon jab_4
+    21300010: raccon jab_5
+    21300012: raccon jab_6
+    21300014: raccon jab_7
+    21300016: raccon jab_8
+    21300018: raccon jab_9
+    21300020: raccon jab_10
+    21300022: raccon jab_11
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 4cf92dde928fcc74fa51bedacb0b0ff9, type: 3}
+  textureSettings:
+    textureType: 8
+    pixelsPerUnit: 32
+    meshType: 1
+    extrudeEdges: 1
+    spritePivot: {x: 0.5, y: 0.5}
+    generatePhysics: 1
+    wrapMode: 1
+    filterMode: 0
+    tileSize: {x: 32, y: 32}
+    tilePadding: {x: 0, y: 0}
+    tileOffset: {x: 0, y: 0}
+  animationSettings: []
+  atlas: {fileID: 2800000, guid: 01b850e9e2c2b044aaf912142af9539d, type: 3}
+  importType: 0

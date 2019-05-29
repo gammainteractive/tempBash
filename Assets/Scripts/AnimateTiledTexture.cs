@@ -24,7 +24,7 @@ public class AnimateTiledTexture : MonoBehaviour
 
 
     public delegate void VoidEvent();               // The Event delegate
-    private List<VoidEvent> _voidEventCallbackList; // A list of functions we need to call if events are enabled
+    public List<VoidEvent> _voidEventCallbackList; // A list of functions we need to call if events are enabled
     protected Coroutine f_updateTiling;
     protected int m_ignoredAnimationFrames = 0;
 
@@ -120,7 +120,7 @@ public class AnimateTiledTexture : MonoBehaviour
     }
 
     // Handles all event triggers to callback functions
-    private void HandleCallbacks(List<VoidEvent> cbList)
+    public void HandleCallbacks(List<VoidEvent> cbList)
     {
         // For now simply loop through them all and call yet.
         for (int i = 0; i < cbList.Count; ++i)
@@ -152,22 +152,27 @@ public class AnimateTiledTexture : MonoBehaviour
     protected virtual IEnumerator updateTiling()
     {
         _isPlaying = true;
-
+     
         // This is the max number of frames
         int checkAgainst = (_rows * _columns);
+
+        if (_playOnce)
+        {
+            _index = 0;  // Reset the index 
+        }
 
         while (true)
         {
             // If we are at the last frame, we need to either loop or break out of the loop
             if (_index >= checkAgainst - m_ignoredAnimationFrames)
             {
-                _index = 0;  // Reset the index
-
+                _index = 0;
                 // If we only want to play the texture one time
                 if (_playOnce)
                 {
                     if (checkAgainst == _columns)
                     {
+                        _index = 0;  // Reset the index 
                         // We are done with the coroutine. Fire the event, if needed
                         if (_enableEvents)
                             HandleCallbacks(_voidEventCallbackList);
@@ -182,9 +187,10 @@ public class AnimateTiledTexture : MonoBehaviour
                         yield break;
                     }
                     else
+                    {
                         checkAgainst = _columns;    // We need to loop through one more row
+                    }
                 }
-
             }
 
             // Apply the offset in order to move to the next frame
@@ -198,7 +204,7 @@ public class AnimateTiledTexture : MonoBehaviour
         }
     }
 
-    private void ApplyOffset()
+    public void ApplyOffset()
     {
         //split into x and y indexes. calculate the new offsets
         Vector2 offset = new Vector2((float)_index / _columns - (_index / _columns), //x index

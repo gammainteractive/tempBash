@@ -82,6 +82,33 @@ public class GameManager : MonoBehaviour {
 
     public float PromptToInputDelay = 0.5f;
 
+    #region StartEndGameHandlers
+
+    public delegate void StartGameHandler();
+
+    public event StartGameHandler StartGameHandle;
+
+    public void StartGame()
+    {
+        if (StartGameHandle != null)
+        {
+            StartGameHandle.Invoke();
+        }
+    }
+
+    public delegate void EndGameHandler();
+
+    public event EndGameHandler EndGameHandle;
+
+    public void EndGame()
+    {
+        if (EndGameHandle != null)
+        {
+            EndGameHandle.Invoke();
+        }
+    }
+
+    #endregion
 
     void Awake()
     {
@@ -155,7 +182,7 @@ public class GameManager : MonoBehaviour {
                 m_GameMode = (int)GAME_MODES.MEMORY;
                 m_MaxNumberOfMiss = 2;
                 SetPlayerHealth(100);
-                SetEnemyHealth(100);
+                SetEnemyHealth(1000);
                 SetEnemyDamage(50);
 
             break;
@@ -165,7 +192,7 @@ public class GameManager : MonoBehaviour {
                 m_GameMode = (int)GAME_MODES.REACTION;
                 m_MaxNumberOfMiss = 5;
                 SetPlayerHealth(100);
-                SetEnemyHealth(300);
+                SetEnemyHealth(3000);
                 SetEnemyDamage(20);
                 //This is the delay after showing the pattern to press
                 PromptToInputDelay /= 2.5f;
@@ -186,6 +213,7 @@ public class GameManager : MonoBehaviour {
 
     public void StartGame(int _gameMode)
     {
+        StartGame();
         m_soundManager.StopMusic();
         m_stage.SetActive(true);
         switch (_gameMode)
@@ -199,9 +227,7 @@ public class GameManager : MonoBehaviour {
                 SetGameModeParameters(GAME_MODES.REACTION);
                 StartPattern(startNumPatterns, true);
                 break;
-
         }
-        
     }
 
     void ResetGameParameters()
@@ -280,7 +306,7 @@ public class GameManager : MonoBehaviour {
             GameOver(false); return;
         }
 
-        uiManager.SetReadyInteractable(false);
+        uiManager.SetUltraButtonInteractable(false);
         uiManager.SetReadyCooldown();
         uiManager.ActivateHitCombo(false);
         uiManager.ActivateDamageModifier(false);
@@ -318,7 +344,7 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            uiManager.ReadyUltraButton(false);
+            uiManager.UltraTextSetActive(false);
         }
         uiManager.SetUltraLevelText(ultraLevel);
     }
@@ -353,7 +379,28 @@ public class GameManager : MonoBehaviour {
         return simonButtons[Random.Range(0, simonButtons.Length)];
     }
 
-    public void SimonButtonHit(SimonButton button)
+    private AnimationManager.ANIMATIONS GetAnimationFromButton(SimonButton _button)
+    {
+        if (simonButtons[0] == _button)
+        {
+            return AnimationManager.ANIMATIONS.PUNCH_UP;//Punch Attacks
+        }
+        else if (simonButtons[1] == _button)
+        {
+            return AnimationManager.ANIMATIONS.KICK;//Special Attacks
+        }
+        else if (simonButtons[2] == _button)
+        {
+            return AnimationManager.ANIMATIONS.SPECIAL;//Kick Attacks
+        }
+        else
+        {
+            throw new UnityException("Button that was pressed doesn't exist");
+        }
+
+    }
+
+    public bool SimonButtonHit(SimonButton button)
     {
         if (currentState == GameState.PlayerInput)
         {
@@ -362,7 +409,9 @@ public class GameManager : MonoBehaviour {
             if (correct)
             {
                 // Hit Correct Button
-                m_animationManager.PlayRandomQueued();
+               
+                m_animationManager.PlayQueued(GetAnimationFromButton(button));
+                
                 enemy.TakeHit(ComboMultiplier());
                 uiManager.HitDamage(ComboMultiplier());
                 currentInputNum++;
@@ -371,11 +420,11 @@ public class GameManager : MonoBehaviour {
                 {
                     uiManager.ActivateHitCombo(true);
                 }
-                if(currentInputNum > 3 
+               /* if(currentInputNum > 3 
                     && currentComboLevel > 3)
                 {
                     m_cameraManager.ZoomIn();
-                }
+                }*/
                 uiManager.UpdateHitCombo(currentComboLevel);
 
                 float ultraMultiplier = (float)1 / InputsForUltraLevel;
@@ -385,7 +434,7 @@ public class GameManager : MonoBehaviour {
                 if (currentInputNum >= currentNumPatterns)
                 {
                     // Correctly entered Sequence
-                    m_cameraManager.ZoomOut();
+                   // m_cameraManager.ZoomOut();
                     UpdateInputTime();
                     UpdatePromptDelay();
                     if (m_GameMode == (int)GAME_MODES.MEMORY)
@@ -406,8 +455,9 @@ public class GameManager : MonoBehaviour {
                 // Incorrect button response
                 MissedInput();
             }
-
+            return correct;
         }
+        return false;
     }
 
     void SetButtonsInteractable(bool interact)
@@ -420,16 +470,23 @@ public class GameManager : MonoBehaviour {
 
     // Ultra Level Amounts
 
-    public void UltraReadyButtonHit()
+   /* public void UltraReadyButtonHit()
     {
         uiManager.UltraMode(true);
         ActivateUltraMode();
-    }
+    }*/
 
-    public void UltraArcadeButtonHit()
+    public void UltraButtonHit()
     {
-        if (currentState != GameState.UltraMode) return;
-        numUltraHits++;
+        if (currentState != GameState.UltraMode)
+        {
+            uiManager.UltraMode(true);
+            ActivateUltraMode();
+        }
+        else
+        {
+            numUltraHits++;
+        }
     }
 
     public void AddUltra(float amount)
@@ -464,9 +521,8 @@ public class GameManager : MonoBehaviour {
 
         if (ultraLevel >= 1)
         {
-            uiManager.ReadyUltraButton(true);
             if (!dangerMode)
-                uiManager.SetReadyInteractable(true);
+                uiManager.SetUltraButtonInteractable(true);
         }
     }
 
@@ -475,8 +531,6 @@ public class GameManager : MonoBehaviour {
     void ActivateUltraMode()
     {
         currentState = GameState.UltraMode;
-        uiManager.ActivateUltraArcadeButton(true);
-        uiManager.ActivateUltraReadyButton(false);
         StopCoroutine(patternRoutine);
         StopPlayerInput();
     }
@@ -486,7 +540,8 @@ public class GameManager : MonoBehaviour {
         ultraTotalAmount = 0;
         ultraLevel = 0;
         uiManager.UltraMode(false);
-        uiManager.SetReadyInteractable(false);
+        uiManager.UltraTextSetActive(false);
+        uiManager.SetUltraButtonInteractable(false);
         uiManager.SetReadyCooldown();
         uiManager.ResetUltraBar();
         int totalDamage = ComboMultiplier() * numUltraHits;
@@ -534,6 +589,7 @@ public class GameManager : MonoBehaviour {
 
     public void GameOver(bool win)
     {
+        EndGame();
         m_cameraManager.ZoomOut();
         currentState = GameState.GameOver;
         uiManager.SetGameOver(win);

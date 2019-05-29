@@ -1,0 +1,33 @@
+fileFormatVersion: 2
+guid: b1b50a4e59f5af64fa3cc58d3e16bd0e
+ScriptedImporter:
+  fileIDToRecycleName:
+    2800000: Texture
+    21300000: dead3_0
+    21300002: dead3_1
+    21300004: dead3_2
+    21300006: dead3_3
+    21300008: dead3_4
+    21300010: dead3_5
+    21300012: dead3_6
+    21300014: dead3_7
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 4cf92dde928fcc74fa51bedacb0b0ff9, type: 3}
+  textureSettings:
+    textureType: 8
+    pixelsPerUnit: 32
+    meshType: 1
+    extrudeEdges: 1
+    spritePivot: {x: 0.5, y: 0.5}
+    generatePhysics: 1
+    wrapMode: 1
+    filterMode: 0
+    tileSize: {x: 32, y: 32}
+    tilePadding: {x: 0, y: 0}
+    tileOffset: {x: 0, y: 0}
+  animationSettings: []
+  atlas: {instanceID: 0}
+  importType: 0

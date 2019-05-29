@@ -11,9 +11,7 @@ public class AnimationManager : MonoBehaviour {
         IDLE,
         KICK,
         PUNCH_UP,
-        JAB,
-        POUND,
-        SPECIAL
+        SPECIAL,
     }
 
     private ANIMATIONS m_currentAnimation = ANIMATIONS.NONE;
@@ -21,6 +19,7 @@ public class AnimationManager : MonoBehaviour {
     public CustomAnimationTextureModel[] m_animations;
 
     public bool m_isQueueAnimations = false;
+    public bool m_isOnIdleAnimation = false;
 
     [Header("Animation Speed")]
     public int m_fps = 20;
@@ -29,6 +28,18 @@ public class AnimationManager : MonoBehaviour {
 	void Start () {
         m_animationRef.QueueMoves = this.m_isQueueAnimations;
         m_animationRef.ChangeAnimationFPS(m_fps);
+
+        //StartCoroutine(LateStart());
+    }
+
+    IEnumerator LateStart()
+    {
+        yield return new WaitForEndOfFrame();
+        UIManager.Instance.GameView();
+        yield return new WaitForEndOfFrame();
+        //PlayQueued(ANIMATIONS.IDLE);
+        //GameManager.instance.StartGame(0);
+        yield return null;
     }
 
     private void Update()
@@ -36,18 +47,41 @@ public class AnimationManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.W))
         {
             // PlayContinuously(ANIMATIONS.IDLE);
-            PlayQueued(ANIMATIONS.JAB);
+             //PlayQueued(ANIMATIONS.KICK);
+            PlayIdleOnRepeat();
         }
         if (Input.GetKeyDown(KeyCode.A))
         {
+            //PlayQueued(ANIMATIONS.KICK);
             PlayRandomQueued();
         }
+    
+        if(m_animationRef.m_queuedAnimations.Count == 0 
+            && !m_animationRef.IsPlaying()
+            && !m_isOnIdleAnimation)
+        {
+            PlayIdleOnRepeat();
+        }
+    }
 
+    private void StopIdleAnimation()
+    {
+        m_isOnIdleAnimation = false;
+        m_animationRef._playOnce = true;
+    }
+
+    private void PlayIdleOnRepeat()
+    {
+        m_currentAnimation = ANIMATIONS.IDLE;
+        m_animationRef.PlayOnce = false;
+        m_isOnIdleAnimation = true;
+        ChangeMaterial(ANIMATIONS.IDLE);
+        m_animationRef.Play();
     }
 
     public void PlayContinuously(ANIMATIONS _animation)
     {
-        m_animationRef._playOnce = false;
+        StopIdleAnimation();
         PlayQueued(_animation);
     }
 
@@ -61,20 +95,29 @@ public class AnimationManager : MonoBehaviour {
 
     public void PlayQueued(ANIMATIONS _animation)
     {
+        StopIdleAnimation();
+        m_animationRef.PlayOnce = true;
         Debug.Log("Anim: " + _animation.ToString() + " Current:" + m_currentAnimation);
-        if(m_currentAnimation != _animation)
+        CustomAnimationTextureModel _animToSet = m_animations[(int)_animation];
+        if (m_currentAnimation != _animation && !m_animationRef.IsPlaying())
         {
             m_currentAnimation = _animation;
-            ChangeMaterial(_animation);
+            ChangeMaterial(_animToSet);
+        } else if (m_animationRef.IsPlaying())
+        {
+            m_animationRef.m_queuedAnimations.Add(_animToSet);
         }
         m_animationRef.Play();
     }
 
-    public void ChangeMaterial(ANIMATIONS _animation)
+    private void ChangeMaterial(CustomAnimationTextureModel _animation)
+    {
+        m_animationRef.ChangeCustomAnimationMaterial(_animation.Material, _animation.Rows, _animation.Columns, _animation.FrameSkips);
+    }
+
+    private void ChangeMaterial(ANIMATIONS _animation)
     {
         CustomAnimationTextureModel m_customAnim = m_animations[(int)_animation];
         m_animationRef.ChangeCustomAnimationMaterial(m_customAnim.Material, m_customAnim.Rows, m_customAnim.Columns, m_customAnim.FrameSkips);
-      /*  m_animationRef._rows = m_animations[m_temp].m_rows;
-        m_animationRef._columns = m_animations[m_temp].m_columns;*/
     }
 }

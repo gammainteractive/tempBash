@@ -7,15 +7,15 @@ using TMPro;
 public class HealthBar : MonoBehaviour
 {
 
-    Image healthBar;
+    public Image healthBarCurrent;
     TextMeshProUGUI healthText;
     string healthTextFormat = "{0} HP";
 
     // Use this for initialization
     void Awake()
     {
-        healthBar = GetComponentInChildren<Image>();
-        healthText = GetComponentInChildren<TextMeshProUGUI>();
+        //healthBarCurrent = GetComponentInChildren<Image>();
+        //healthText = GetComponentInChildren<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
@@ -26,13 +26,13 @@ public class HealthBar : MonoBehaviour
 
     public void UpdateHealthBar(float currentHealth, float maxHealth)
     {
-        healthBar.fillAmount = currentHealth / maxHealth;
+        healthBarCurrent.fillAmount = currentHealth / maxHealth;
         UpdateHealthText(currentHealth);
     }
 
     public void UpdateHealthText(float health)
     {
-        healthText.text = string.Format(healthTextFormat, health);
+        //healthText.text = string.Format(healthTextFormat, health);
     }
 
 }

@@ -23,20 +23,23 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
         base._framesPerSecond = _fps;
     }
 
+    public bool PlayOnce
+    {
+        get { return _playOnce; }
+        set { _playOnce = value; }
+    }
+
+    public bool IsPlaying()
+    {
+        return _isPlaying;
+    }
+
     public void ChangeCustomAnimationMaterial(Material _material, int _rows, int _columns, int _ignoredAnimationFrames)
     {
-        if (_isPlaying)
-        {
-            CustomAnimationTextureModel _anim = new CustomAnimationTextureModel(_material, _rows, _columns, _ignoredAnimationFrames);
-            m_queuedAnimations.Add(_anim);
-        }
-        else
-        {
-            this._rows = _rows;
-            this._columns = _columns;
-            this.m_ignoredAnimationFrames = _ignoredAnimationFrames;
-            base.ChangeMaterial(_material);
-        }
+        this._rows = _rows;
+        this._columns = _columns;
+        this.m_ignoredAnimationFrames = _ignoredAnimationFrames;
+        base.ChangeMaterial(_material);
     }
 
     public void Play()
@@ -57,7 +60,6 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
                 CustomAnimationTextureModel m_temp = m_queuedAnimations[0];
                 ChangeCustomAnimationMaterial(m_temp.Material, m_temp.Rows, m_temp.Columns, m_temp.FrameSkips);
                 m_queuedAnimations.Remove(m_temp);
-                _isPlaying = true;
             }
 
         }
@@ -70,4 +72,5 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
         // Start the update tiling coroutine
         f_updateTiling = StartCoroutine(updateTiling());
     }
+    
 }

@@ -1,0 +1,87 @@
+{ "frames": {
+   "dead3 0.ase": {
+    "frame": { "x": 0, "y": 0, "w": 69, "h": 64 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 3, "w": 69, "h": 64 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 100
+   },
+   "dead3 1.ase": {
+    "frame": { "x": 69, "y": 0, "w": 92, "h": 63 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 4, "w": 92, "h": 63 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 100
+   },
+   "dead3 2.ase": {
+    "frame": { "x": 161, "y": 0, "w": 61, "h": 67 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 7, "y": 0, "w": 61, "h": 67 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 100
+   },
+   "dead3 3.ase": {
+    "frame": { "x": 222, "y": 0, "w": 62, "h": 67 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 0, "w": 62, "h": 67 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 100
+   },
+   "dead3 4.ase": {
+    "frame": { "x": 284, "y": 0, "w": 62, "h": 67 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 3, "y": 0, "w": 62, "h": 67 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 100
+   },
+   "dead3 5.ase": {
+    "frame": { "x": 346, "y": 0, "w": 67, "h": 66 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 0, "y": 1, "w": 67, "h": 66 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 100
+   },
+   "dead3 6.ase": {
+    "frame": { "x": 413, "y": 0, "w": 75, "h": 55 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 2, "y": 12, "w": 75, "h": 55 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 200
+   },
+   "dead3 7.ase": {
+    "frame": { "x": 488, "y": 0, "w": 75, "h": 55 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 2, "y": 12, "w": 75, "h": 55 },
+    "sourceSize": { "w": 92, "h": 67 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.11-x64",
+  "image": "dead3.png",
+  "format": "I8",
+  "size": { "w": 736, "h": 67 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "tail}", "opacity": 255, "blendMode": "normal" },
+   { "name": "body", "opacity": 255, "blendMode": "normal" },
+   { "name": "legs", "opacity": 255, "blendMode": "normal" },
+   { "name": "hands", "opacity": 255, "blendMode": "normal" },
+   { "name": "head", "opacity": 255, "blendMode": "normal" },
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
