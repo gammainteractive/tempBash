@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Death
+  m_Name: Special
   m_Shader: {fileID: 51, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -39,9 +39,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: b1b50a4e59f5af64fa3cc58d3e16bd0e, type: 3}
-        m_Scale: {x: 0.33333334, y: 0.33333334}
-        m_Offset: {x: 0.6666667, y: -0.000000004967054}
+        m_Texture: {fileID: 2800000, guid: e5361504825ee734a9cfddc15266bcf3, type: 3}
+        m_Scale: {x: 0.2, y: 1}
+        m_Offset: {x: 0.8, y: 0}
     - _MetallicGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}

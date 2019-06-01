@@ -10,8 +10,14 @@ public class AnimationManager : MonoBehaviour {
         NONE,
         IDLE,
         KICK,
-        PUNCH_UP,
+        PUNCH,
         SPECIAL,
+        DEATH,
+        HURT,
+        KICK2,
+        LOW_KICK,
+        PUNCH2,
+
     }
 
     private ANIMATIONS m_currentAnimation = ANIMATIONS.NONE;
@@ -29,7 +35,7 @@ public class AnimationManager : MonoBehaviour {
         m_animationRef.QueueMoves = this.m_isQueueAnimations;
         m_animationRef.ChangeAnimationFPS(m_fps);
 
-        //StartCoroutine(LateStart());
+       // StartCoroutine(LateStart());
     }
 
     IEnumerator LateStart()
@@ -47,13 +53,14 @@ public class AnimationManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.W))
         {
             // PlayContinuously(ANIMATIONS.IDLE);
-             //PlayQueued(ANIMATIONS.KICK);
-            PlayIdleOnRepeat();
+             PlayQueued(ANIMATIONS.PUNCH2);
+            //PlayIdleOnRepeat();
         }
         if (Input.GetKeyDown(KeyCode.A))
         {
             //PlayQueued(ANIMATIONS.KICK);
-            PlayRandomQueued();
+            PlayQueued(ANIMATIONS.KICK2);
+            //PlayRandomQueued();
         }
     
         if(m_animationRef.m_queuedAnimations.Count == 0 

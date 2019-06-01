@@ -1,30 +1,40 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+[Serializable]
 public class SimonButton : MonoBehaviour
 {
-    
+    public int m_buttonValue = 0;
     Image myImage;
     Button myButton;
     public RectTransform m_actionIcon;
     private Vector2 m_defaultPosition;
-    private float m_yOffsetPressed = 15;
+    private float m_yOffsetPressed = 15f;
     private float m_buttonPressedTime = 0.15f;
     public Sprite m_defaultButtonSprite;
     public Sprite m_ButtonWhenShowingPattern;
     public Sprite m_ButtonWhenPressed;
     public Sprite m_ButtonIncorrect;
-    GameManager gameManager;
 
     public Sprite[] m_ButtonColors;
 
+    public SimonButton(SimonButton _button)
+    {
+        m_buttonValue = _button.m_buttonValue;
+        m_defaultButtonSprite = _button.m_defaultButtonSprite;
+        m_ButtonWhenPressed = _button.m_ButtonWhenPressed;
+        m_ButtonWhenShowingPattern = _button.m_ButtonWhenShowingPattern;
+        m_defaultButtonSprite = _button.m_defaultButtonSprite;
+        m_ButtonIncorrect = _button.m_ButtonIncorrect;
+    }
+
 	// Use this for initialization
 	void Awake () {
-        gameManager = FindObjectOfType<GameManager>();
-        myImage = GetComponentInChildren<Image>();
+        myImage = GetComponent<Image>();
         myButton = GetComponent<Button>();
         //buttonColor = myImage.color;
         m_defaultButtonSprite = GetComponent<Image>().sprite;
@@ -32,13 +42,35 @@ public class SimonButton : MonoBehaviour
 
     private void Start()
     {
-        m_defaultPosition = m_actionIcon.anchoredPosition;
+        //For reason these reset back to 0 when in game
+        m_yOffsetPressed = 15;
+        m_buttonPressedTime = 0.15f;
+
+        m_defaultPosition = new Vector2(m_actionIcon.anchoredPosition.x, m_actionIcon.anchoredPosition.y);
         myButton.onClick.AddListener(ButtonHit);
+    }
+
+    private void InitializeView()
+    {
+        myImage.sprite = m_defaultButtonSprite;
     }
 
     public void SimonAlert()
     {
         StartCoroutine(ButtonAlert());
+    }
+
+    public void SetProperties(SimonButton _simonButton)
+    {
+        m_buttonValue = _simonButton.m_buttonValue;
+        m_defaultButtonSprite = _simonButton.m_defaultButtonSprite;
+        m_ButtonWhenPressed = _simonButton.m_defaultButtonSprite;
+        InitializeView();
+    }
+
+    public void SetButtonValue(int _value)
+    {
+        m_buttonValue = _value;
     }
 
     IEnumerator ButtonAlert()
@@ -50,9 +82,8 @@ public class SimonButton : MonoBehaviour
 
     void ButtonHit()
     {
-        if (gameManager.SimonButtonHit(this))
+        if (GameManager.instance.SimonButtonHit(m_buttonValue))
         {
-           // myImage.sprite = m_ButtonWhenPressed;
             StartCoroutine(CorrectButtonPress());
         }
         else

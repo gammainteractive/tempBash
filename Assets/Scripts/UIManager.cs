@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour {
 
@@ -14,7 +15,14 @@ public class UIManager : MonoBehaviour {
         GAME_VIEW
     }
 
-    public TextMeshProUGUI newPatternText;
+    public Transform[] m_gameModeViews;
+    public enum GAME_MODE_VIEW
+    {
+        MODE_A,
+        MODE_B
+    }
+
+    public Transform[] m_buttonRowsModeB;
     public TimerBar timerBar;
     public HealthBar playerHealth;
     public HealthBar enemyHealth;
@@ -26,6 +34,12 @@ public class UIManager : MonoBehaviour {
     public GameObject gameOver;
     public GameObject restartButton;
     public DamageModifierText m_damageModifier;
+    public Transform m_ultraHitsText;
+
+    private List<Vector3> m_defaultButtonPositionModeB;
+    private List<Vector3> m_defaultButtonScaleModeB;
+    public List<Vector3> m_targetButtonPositionsModeB;
+    public List<Vector3> m_targetButtonScaleModeB;
 
     private void Awake()
     {
@@ -36,12 +50,26 @@ public class UIManager : MonoBehaviour {
     void Start () {
         ActivateTimerBar(false);
         restartButton.SetActive(false);
+        InitDefaultPositions();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    private void InitDefaultPositions()
+    {
+        m_defaultButtonPositionModeB = new List<Vector3>();
+        m_defaultButtonScaleModeB = new List<Vector3>();
+        m_targetButtonPositionsModeB = new List<Vector3>();
+        m_targetButtonScaleModeB = new List<Vector3>();
+
+        for (int i = 0; i < m_buttonRowsModeB.Length; i++)
+        {
+            Vector2 _defaultPosition = m_buttonRowsModeB[i].localPosition;
+            Vector2 _defaultScale = m_buttonRowsModeB[i].localScale;
+            m_defaultButtonPositionModeB.Add(_defaultPosition);
+            m_defaultButtonScaleModeB.Add(_defaultScale);
+            m_targetButtonPositionsModeB.Add(_defaultPosition);
+            m_targetButtonScaleModeB.Add(_defaultScale);
+        }
+    }
 
     public void TitleView()
     {
@@ -84,7 +112,7 @@ public class UIManager : MonoBehaviour {
         }
         gameOver.SetActive(true);
         restartButton.SetActive(true);
-        ActivatePromptText(false);
+       
     }
 
     public void UltraMode(bool modeOn)
@@ -98,6 +126,63 @@ public class UIManager : MonoBehaviour {
         {
             SetUltraLevelText(0);
         }
+    }
+
+    void Update()
+    {
+
+    }
+
+    public bool SetButtonRowInteractive(int _currentRow)
+    {
+        Button[] _buttons = m_buttonRowsModeB[_currentRow].GetComponentsInChildren<Button>();
+        bool _indexReset = true;
+
+        for (int i = 0; i < _buttons.Length; i++)
+        {
+            _buttons[i].interactable = false;
+        }
+
+        //If current row is max row, reset to 0
+        if (_currentRow == m_buttonRowsModeB.Length - 1)
+        {
+            _buttons = m_buttonRowsModeB[0].GetComponentsInChildren<Button>();
+        }
+        else
+        {
+            _buttons = m_buttonRowsModeB[_currentRow + 1].GetComponentsInChildren<Button>();
+            _indexReset = false;
+        }
+
+        for (int i = 0; i < _buttons.Length; i++)
+        {
+            _buttons[i].interactable = true;
+        }
+
+        return _indexReset;
+    }
+
+    public void ModeBMoveButtons()
+    {
+        Vector3 m_tempPos = m_targetButtonPositionsModeB[m_buttonRowsModeB.Length - 1];
+        Vector3 m_tempScale = m_targetButtonScaleModeB[m_buttonRowsModeB.Length - 1];
+        for (int i = m_buttonRowsModeB.Length - 1; i >= 0; i--)
+        {
+            if(i != 0) {
+                m_targetButtonPositionsModeB[i] = m_targetButtonPositionsModeB[i - 1];
+                m_targetButtonScaleModeB[i] = m_targetButtonScaleModeB[i - 1];
+            } else
+            {
+                m_targetButtonPositionsModeB[i] = m_tempPos;
+                m_targetButtonScaleModeB[i] = m_tempScale;
+            }
+           
+            m_buttonRowsModeB[i].localScale = m_targetButtonScaleModeB[i];
+            m_buttonRowsModeB[i].localPosition = m_targetButtonPositionsModeB[i];
+
+        }
+
+       
     }
 
     public void SetDamageModifier(float _modifier)
@@ -120,6 +205,16 @@ public class UIManager : MonoBehaviour {
 
     }
 
+    public void ShowGameModeView(GAME_MODE_VIEW _gameViewMode)
+    {
+        for(int i = 0; i < m_gameModeViews.Length; i++)
+        {
+            m_gameModeViews[i].gameObject.SetActive(false);
+        }
+        m_gameModeViews[(int)_gameViewMode].gameObject.SetActive(true);
+    }
+
+
     public void PromptPrompt(bool prompt)
     {
         if (prompt) promptText.Prompt();
@@ -138,7 +233,7 @@ public class UIManager : MonoBehaviour {
 
     public void UltraTextSetActive(bool ready)
     {
-        ultraButton.UltraTextSetActive(ready);
+        m_ultraHitsText.gameObject.SetActive(ready);
     }
 
     public void SetUltraLevelText(int ultraLevel)
@@ -189,18 +284,5 @@ public class UIManager : MonoBehaviour {
     public void ActivateTimerBar(bool active)
     {
         timerBar.ActivateTimer(active);
-    }
-
-    public void ActivateNewPattern()
-    {
-        StartCoroutine(NewPatternDelay());
-    }
-
-    IEnumerator NewPatternDelay()
-    {
-        newPatternText.enabled = true;
-        yield return new WaitForSeconds(1);
-        newPatternText.enabled = false;
-
     }
 }

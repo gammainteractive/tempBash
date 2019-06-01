@@ -20,7 +20,7 @@ public class LivingBody : MonoBehaviour {
         Start();
     }
 
-    public virtual void TakeHit(int hitAmount = 1)
+    public virtual void TakeHit(float hitAmount = 1)
     {
       
         currentHealth -= hitAmount;

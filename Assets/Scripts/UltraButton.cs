@@ -8,7 +8,6 @@ public class UltraButton : MonoBehaviour
 {
     public GameObject m_ultraGO;
     Button m_ultraButton;
-    TextMeshProUGUI ultraText;
 
     public GameObject m_ultraFillGO;
     Image m_ultraFillImage;
@@ -28,16 +27,14 @@ public class UltraButton : MonoBehaviour
         m_ultraFillButton = m_ultraFillGO.GetComponent<Button>();
 
         m_ultraButton = m_ultraGO.GetComponent<Button>();
-
-        ultraText = m_ultraFillGO.GetComponentInChildren<TextMeshProUGUI>();
+        
         m_ultraFillImage.fillAmount = 0;
         SetUltraButtonInteractable(false);
     }
 
     private void Start()
     {
-        SetUltraButtonInteractable(false);
-        UltraTextSetActive(false);
+        SetUltraButtonInteractable(false);  
         GameManager.instance.StartGameHandle += () => {
             StartUltraCooldown();
         };
@@ -54,7 +51,6 @@ public class UltraButton : MonoBehaviour
 
     public void StartUltraCooldown()
     {
-        Debug.Log("Start ultra cooldown");
         CoolDown();
         m_startCooldown = true;
     }
@@ -71,7 +67,6 @@ public class UltraButton : MonoBehaviour
             && GameManager.instance.currentState != GameManager.GameState.GameOver
             && m_startCooldown)
         {
-            Debug.Log("running");
             if (currentTime < GameManager.instance.UltraCoolDownTime)
             {
                 currentTime += Time.deltaTime;
@@ -85,11 +80,6 @@ public class UltraButton : MonoBehaviour
                 GameManager.instance.dangerMode = false;
             }
         }
-    }
-
-    public void UltraTextSetActive(bool active)
-    {
-        ultraText.enabled = active;
     }
 
     public void HitUltraButton()

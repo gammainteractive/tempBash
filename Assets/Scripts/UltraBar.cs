@@ -55,7 +55,6 @@ public class UltraBar : MonoBehaviour {
         startDrainUltraLevel = GameManager.instance.ultraLevel;
         ultraDrainTime = (float) startDrainUltraLevel * GameManager.instance.DrainTimePerUltraLevel;
         currentDrainTime = ultraDrainTime;
-        Debug.Log("Ultra drain");
         drainUltra = true;
     }
 
@@ -90,11 +89,14 @@ public class UltraBar : MonoBehaviour {
             return;
         }
 
-        ChangeBarColors(1);
+        if (GameManager.instance.m_GameMode == (int)GameManager.GAME_MODES.MODE_A)
+        {
+            ChangeBarColors(1);
 
-        SwitchUltraBar();
+            SwitchUltraBar();
 
-        ChangeBarColors(0);
+            ChangeBarColors(0);
+        }
     }
 
     public void SwitchUltraBar()
