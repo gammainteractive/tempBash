@@ -4,16 +4,21 @@ using UnityEngine;
 
 public class AnimateTiledTexture : MonoBehaviour
 {
-    public int _columns = 2;                        // The number of columns of the texture
-    public int _rows = 2;                           // The number of rows of the texture
+    [HideInInspector]
+    public int _columns = 1;                        // The number of columns of the texture
+    [HideInInspector]
+    public int _rows = 1;                           // The number of rows of the texture
+    [HideInInspector]
     public Vector2 _scale = new Vector3(1f, 1f);    // Scale the texture. This must be a non-zero number. negative scale flips the image
+    [HideInInspector]
     public Vector2 _offset = Vector2.zero;          // You can use this if you do not want the texture centered. (These are very small numbers .001)
+    [HideInInspector]
     public Vector2 _buffer = Vector2.zero;          // You can use this to buffer frames to hide unwanted grid lines or artifacts
     public float _framesPerSecond = 10f;            // Frames per second that you want to texture to play at
     public bool _playOnce = false;                  // Enable this if you want the animation to only play one time
     public bool _disableUponCompletion = false;     // Enable this if you want the texture to disable the renderer when it is finished playing
     public bool _enableEvents = false;              // Enable this if you want to register an event that fires when the animation is finished playing
-    public bool _playOnEnable = true;               // The animation will play when the object is enabled
+    public bool _playOnEnable = false;               // The animation will play when the object is enabled
     public bool _newMaterialInstance = false;       // Set this to true if you want to create a new material instance
     
     protected int _index = 0;                         // Keeps track of the current frame 

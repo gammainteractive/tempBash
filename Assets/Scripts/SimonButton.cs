@@ -82,13 +82,16 @@ public class SimonButton : MonoBehaviour
 
     void ButtonHit()
     {
-        if (GameManager.instance.SimonButtonHit(m_buttonValue))
-        {
-            StartCoroutine(CorrectButtonPress());
-        }
-        else
-        {
-            StartCoroutine(IncorrectButtonPress());
+        //Enable button hits when buttons are not animating or it will cause bugs
+        if (!UIManager.Instance.m_startButtonAnimationModeB){
+            if (GameManager.instance.SimonButtonHit(m_buttonValue))
+            {
+                StartCoroutine(CorrectButtonPress());
+            }
+            else
+            {
+                StartCoroutine(IncorrectButtonPress());
+            }
         }
     }
 

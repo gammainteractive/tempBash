@@ -59,6 +59,8 @@ public class UIManager : MonoBehaviour {
         m_defaultButtonScaleModeB = new List<Vector3>();
         m_targetButtonPositionsModeB = new List<Vector3>();
         m_targetButtonScaleModeB = new List<Vector3>();
+        m_buttonRowsModeBCurrentPosition = new List<Vector3>();
+        m_buttonRowsModeBCurrentScale = new List<Vector3>();
 
         for (int i = 0; i < m_buttonRowsModeB.Length; i++)
         {
@@ -68,6 +70,8 @@ public class UIManager : MonoBehaviour {
             m_defaultButtonScaleModeB.Add(_defaultScale);
             m_targetButtonPositionsModeB.Add(_defaultPosition);
             m_targetButtonScaleModeB.Add(_defaultScale);
+            m_buttonRowsModeBCurrentPosition.Add(_defaultPosition);
+            m_buttonRowsModeBCurrentScale.Add(_defaultScale);
         }
     }
 
@@ -127,10 +131,66 @@ public class UIManager : MonoBehaviour {
             SetUltraLevelText(0);
         }
     }
-
+    
     void Update()
     {
+      /*  if (m_startButtonAnimationModeB)
+        {
+            t += Time.deltaTime / timeToReachTarget;
+            //Move all buttons except the first one which should teleport to the top
+            for (int i = 2; i < m_buttonRowsModeB.Length; i++)
+            {
+                m_buttonRowsModeB[i].position = Vector3.Lerp(startPosition, target, t);
+            }
+        }*/
+    }
 
+    float t;
+    Vector3 startPosition;
+    Vector3 target;
+    float timeToReachTarget;
+    public bool m_startButtonAnimationModeB = false;
+    private List<Vector3> m_buttonRowsModeBCurrentPosition;
+    private List<Vector3> m_buttonRowsModeBCurrentScale;
+
+    public void MoveAnimationButtons()
+    {
+        StartCoroutine(IMoveAnimationButtons());
+    }
+
+    private IEnumerator IMoveAnimationButtons()
+    {
+        m_startButtonAnimationModeB = true;
+        float timeToMove = 0.10f;
+        var currentPos = transform.position;
+        var t = 0f;
+
+        int m_targetIndex = GameManager.instance.m_buttonRowIndex - 1; 
+        if (m_targetIndex == -1)
+        {
+            m_targetIndex = 5;
+        }
+
+        while (t < 1)
+        {
+            t += Time.deltaTime / timeToMove;
+            for (int i = 0; i < m_buttonRowsModeB.Length; i++)
+            {
+                
+                //Make sure the first button row doesn't animate
+                if (i == m_targetIndex)
+                {
+                    m_buttonRowsModeB[m_targetIndex].localPosition = m_targetButtonPositionsModeB[i];
+                    m_buttonRowsModeB[m_targetIndex].localScale = m_targetButtonScaleModeB[i];
+                } else
+                {
+                    m_buttonRowsModeB[i].localPosition = Vector3.Lerp(m_buttonRowsModeBCurrentPosition[i], m_targetButtonPositionsModeB[i], t);
+                    m_buttonRowsModeB[i].localScale = Vector3.Lerp(m_buttonRowsModeBCurrentScale[i], m_targetButtonScaleModeB[i], t);
+                }
+            }
+            yield return null;
+        }
+        m_startButtonAnimationModeB = false;
     }
 
     public bool SetButtonRowInteractive(int _currentRow)
@@ -176,9 +236,10 @@ public class UIManager : MonoBehaviour {
                 m_targetButtonPositionsModeB[i] = m_tempPos;
                 m_targetButtonScaleModeB[i] = m_tempScale;
             }
-           
-            m_buttonRowsModeB[i].localScale = m_targetButtonScaleModeB[i];
-            m_buttonRowsModeB[i].localPosition = m_targetButtonPositionsModeB[i];
+            m_buttonRowsModeBCurrentPosition[i] = m_buttonRowsModeB[i].localPosition;
+            m_buttonRowsModeBCurrentScale[i] = m_buttonRowsModeB[i].localScale;
+            // m_buttonRowsModeB[i].localScale = m_targetButtonScaleModeB[i];
+            // m_buttonRowsModeB[i].localPosition = m_targetButtonPositionsModeB[i];
 
         }
 

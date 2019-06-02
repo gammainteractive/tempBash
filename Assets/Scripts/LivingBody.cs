@@ -22,13 +22,7 @@ public class LivingBody : MonoBehaviour {
 
     public virtual void TakeHit(float hitAmount = 1)
     {
-      
         currentHealth -= hitAmount;
-        if (currentHealth <= 0) {
-            if (tag == "Player")
-                GameManager.instance.GameOver(false);
-            else GameManager.instance.GameOver(true);
-        }
         currentHealth = Mathf.Max(currentHealth, 0);
         myHealthBar.UpdateHealthBar(currentHealth, maxHealth);
     }

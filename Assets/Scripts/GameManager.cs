@@ -22,15 +22,13 @@ public class GameManager : MonoBehaviour {
     public SimonButton[] m_modeASimonButtons;
     public Transform m_modeBgameObject;
     public SimonButton[] m_modeBSimonButtons;
-    SimonButton[] m_ultraModeB;
 
     public List<SimonButton> currentButtonPattern = new List<SimonButton>();
     public SimonButton[] inputButtonPattern;
     int startNumPatterns = 1;
     public int currentNumPatterns;
     public float ButtonAlertTime;
-
-    public int MaxEnemyHealth;
+    
     public int currentInputNum;
     public SoundManager m_soundManager;
     public UIManager uiManager;
@@ -42,7 +40,6 @@ public class GameManager : MonoBehaviour {
     private float m_healthTimer = 1;
     public float m_currentHealthTimer = 0;
     public GameObject m_stage;
-    public int m_currentButtonRowModeB = 1;
 
     public enum GAME_MODES
     {
@@ -103,8 +100,15 @@ public class GameManager : MonoBehaviour {
 
     public event StartGameHandler StartGameHandle;
 
+    public int m_buttonRowIndex = 0;
+    private bool m_isDebugMode = true;
+    private bool m_gameOverFlag = false;
+
     public void StartGame()
     {
+#if !UNITY_EDITOR
+        m_isDebugMode = false;
+#endif
         if (StartGameHandle != null)
         {
             StartGameHandle.Invoke();
@@ -123,7 +127,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    #endregion
+#endregion
 
     void Awake()
     {
@@ -154,9 +158,10 @@ public class GameManager : MonoBehaviour {
 
         if (m_GameMode == (int)GAME_MODES.MODE_B
             && currentState != GameState.GameOver
-            && currentState != GameState.UltraMode)
+            && currentState != GameState.UltraMode
+            && !m_isDebugMode)
         {
-            //player.TakeHit(Time.deltaTime + 0.5f);
+            player.TakeHit(Time.deltaTime + 0.5f);
         }
     }
 
@@ -265,53 +270,64 @@ public class GameManager : MonoBehaviour {
     private void ModeBCorrectButton()
     {
         player.AddHealth(20);
-        ButtonNextInQueue();
+        SetNextButtonProperties();
         uiManager.ModeBMoveButtons();
-    }
 
-    int m_buttonRowIndex = 0;
-
-    private void ButtonNextInQueue()
-    {
-        //Disable current button interactable and enable on the next row
-        if (uiManager.SetButtonRowInteractive(m_currentButtonRowModeB))
+        //Set next row index specifically for the button rows (since the transform moves, we must also adjust this to do along with it)
+        m_buttonRowIndex++; 
+        if (m_buttonRowIndex > 5)
         {
-            m_currentButtonRowModeB = 0;
-        } else
-        {
-            m_currentButtonRowModeB++;
+            m_buttonRowIndex = 0;
         }
 
-        SetNextButton();
+        //We must place the animation after incrementing buttonRow index because it is inside a coroutine
+        uiManager.MoveAnimationButtons();
     }
 
-    void SetNextButton()
+    private void SetButtonInteractable()
     {
+        //Disable current button interactable and enable on the next row
+        if (m_buttonRowIndex + 1 == m_buttonRowsModeB)
+        {
+            uiManager.SetButtonRowInteractive(0);
+        } else
+        {
+            uiManager.SetButtonRowInteractive(m_buttonRowIndex + 1);
+        }
+        //uiManager.m_startButtonAnimationModeB = true;
+     
+    }
+
+    void SetNextButtonProperties()
+    {
+        SetButtonInteractable();
         //Move to next pattern
         currentButtonPattern.RemoveAt(0);
 
         //Set button colors on the top row
         int m_random = Random.Range(0, 3);
-        currentButtonPattern.Add(m_simonButtonReference[m_random]);
-        int m_temp = (m_buttonRowIndex * 3 + m_random);
 
-        for (int i = m_buttonRowIndex * 3; i < m_buttonRowIndex * 3 + 3; i++)    //Last row of buttons
+        currentButtonPattern.Add(m_simonButtonReference[m_random]);
+        int m_startIndexOnTopRow = m_buttonRowIndex * 3;
+        int m_buttonTarget = (m_startIndexOnTopRow + m_random);
+
+        for (int i = m_startIndexOnTopRow; i < m_startIndexOnTopRow + 3; i++)    //Last row of buttons
         {
-            if (i == (m_temp))
+            if (currentState == GameState.UltraMode)
             {
-                m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[m_random]);
+                m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[i - m_startIndexOnTopRow]); 
             }
             else
             {
-                m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[(int)SIMON_BUTTON_TYPES.INCORRECT]);
+                if (i == (m_buttonTarget))
+                {
+                    m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[m_random]);
+                }
+                else
+                {
+                    m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[(int)SIMON_BUTTON_TYPES.INCORRECT]);
+                }
             }
-        }
-
-        //Set next row index specifically for the button rows (since the transform moves, we must also adjust this to do along with it)
-        m_buttonRowIndex++;
-        if (m_buttonRowIndex > 5)
-        {
-            m_buttonRowIndex = 0;
         }
     }
 
@@ -411,6 +427,9 @@ public class GameManager : MonoBehaviour {
         if (dangerMode || player.currentHealth <= 0)
         {
             GameOver(false); return;
+        } else
+        {
+            m_animationManager.MissedInput();
         }
 
         if(m_GameMode == (int)GAME_MODES.MODE_A) {
@@ -499,9 +518,9 @@ public class GameManager : MonoBehaviour {
         return m_modeASimonButtons[Random.Range(0, m_modeASimonButtons.Length)];
     }
 
-    private AnimationManager.ANIMATIONS GetAnimationFromButton(int _buttonValue)
+    private int GetAnimationFromButton(int _buttonValue)
     {
-        return (AnimationManager.ANIMATIONS)(_buttonValue + 2);
+        return (_buttonValue + 2);
     }
 
     public bool SimonButtonHit(int _buttonValue)
@@ -509,11 +528,17 @@ public class GameManager : MonoBehaviour {
         if (currentState == GameState.PlayerInput)
         {
             bool correct = HitCorrectButton(_buttonValue);
+            // Hit Correct Button
             if (correct)
             {
-                // Hit Correct Button
-                m_animationManager.PlayQueued(GetAnimationFromButton(_buttonValue));
                 enemy.TakeHit(ComboMultiplier());
+                if(enemy.currentHealth <= 0)
+                {
+                    GameOver(true);
+                } else
+                {
+                    m_animationManager.MainCharacterPlayQueued(GetAnimationFromButton(_buttonValue));
+                }
                 uiManager.HitDamage(ComboMultiplier());
                 GainCombo(currentInputTime/inputTimePerPrompt);
                 if (currentComboLevel >= 3)
@@ -550,7 +575,7 @@ public class GameManager : MonoBehaviour {
         }
         else if (currentState == GameState.UltraMode)
         {
-            player.AddHealth(20);
+            ModeBCorrectButton();
             numUltraHits++;
             return true;
         }
@@ -651,12 +676,12 @@ public class GameManager : MonoBehaviour {
 
     private void UltraActivateModeB()
     {
-        m_ultraModeB = new SimonButton[m_modeBSimonButtons.Length];
+      //  m_ultraModeB = new SimonButton[m_modeBSimonButtons.Length];
         for (int j = 0; j < m_buttonRowsModeB; j++)
         {
             for (int i = 0; i < 3; i++)
             {
-                m_ultraModeB[j * 3 + i] = new SimonButton(m_modeBSimonButtons[j * 3 + i]);
+               // m_ultraModeB[j * 3 + i] = new SimonButton(m_modeBSimonButtons[j * 3 + i]);
                 m_modeBSimonButtons[j * 3 + i].SetProperties(m_simonButtonReference[i]);
             }
         }
@@ -747,13 +772,21 @@ public class GameManager : MonoBehaviour {
 
     public void GameOver(bool win)
     {
+        //Added gameover flag due to multiple calls on spam
+        if (m_gameOverFlag)
+        {
+            return;
+        } else
+        {
+            m_gameOverFlag = true;
+        }
         EndGame();
         //m_cameraManager.ZoomOut();
         currentState = GameState.GameOver;
         uiManager.SetGameOver(win);
+        m_animationManager.GameOverAnimations(win);
         if (m_GameMode == (int)GAME_MODES.MODE_A)
         {
-            Debug.Log("Call this");
             uiManager.ActivatePromptText(false);
             StopCoroutine(patternRoutine);
         }

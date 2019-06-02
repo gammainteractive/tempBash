@@ -5,7 +5,7 @@ using UnityEngine;
 public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
 
     public List<CustomAnimationTextureModel> m_queuedAnimations;
-    private bool m_isQueueMoves = false;
+    private bool m_isQueueMoves = true;
 
     private void Start()
     {
@@ -61,7 +61,6 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
                 ChangeCustomAnimationMaterial(m_temp.Material, m_temp.Rows, m_temp.Columns, m_temp.FrameSkips);
                 m_queuedAnimations.Remove(m_temp);
             }
-
         }
         // Make sure the renderer is enabled
         GetComponent<Renderer>().enabled = true;
