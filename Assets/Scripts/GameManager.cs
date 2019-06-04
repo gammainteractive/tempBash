@@ -11,17 +11,8 @@ public class GameManager : MonoBehaviour {
     public enum GameState { DisplayPattern, PlayerInput, UltraMode, GameOver}
     public GameState currentState;
 
-    public enum SIMON_BUTTON_TYPES {
-        PUNCH, //Purple
-        KICK,   //Blue
-        SPECIAL,    //Green
-        INCORRECT   //Black
-    }
-    public List<SimonButton> m_simonButtonReference;
-
     public SimonButton[] m_modeASimonButtons;
-    public Transform m_modeBgameObject;
-    public SimonButton[] m_modeBSimonButtons;
+  
 
     public List<SimonButton> currentButtonPattern = new List<SimonButton>();
     public SimonButton[] inputButtonPattern;
@@ -90,19 +81,15 @@ public class GameManager : MonoBehaviour {
     Coroutine inputRoutine;
     [Space]
 
-    private int m_buttonRowsModeB = 6;
-
     public float PromptToInputDelay = 0.5f;
+    private bool m_isDebugMode = true;
+    private bool m_gameOverFlag = false;
 
     #region StartEndGameHandlers
 
     public delegate void StartGameHandler();
 
     public event StartGameHandler StartGameHandle;
-
-    public int m_buttonRowIndex = 0;
-    private bool m_isDebugMode = true;
-    private bool m_gameOverFlag = false;
 
     public void StartGame()
     {
@@ -214,7 +201,11 @@ public class GameManager : MonoBehaviour {
         {
             case GAME_MODES.MODE_A:
                 m_GameMode = (int)GAME_MODES.MODE_A;
+#if UNITY_EDITOR
+                inputTimePerPrompt = 100f;
+#else
                 inputTimePerPrompt = 1f;
+#endif
                 SetPlayerHealth(100);
                 SetEnemyHealth(1000);
                 SetEnemyDamage(50);
@@ -245,20 +236,23 @@ public class GameManager : MonoBehaviour {
 
     private void InitializeModeB()
     {
-        m_modeBSimonButtons = m_modeBgameObject.GetComponentsInChildren<SimonButton>(true);
-
         int m_random = 0;
-        for (int j = 0; j < m_buttonRowsModeB; j++) {
-            m_random = Random.Range(0, 3); 
+        int m_currentIndex = 0;
+
+        for (int j = 0; j < uiManager.m_buttonRowsModeB.Length; j++)
+        {
+            m_random = Random.Range(0, 3);
             for (int i = 0; i < 3; i++)
             {
+                m_currentIndex = j * 3 + i;
                 if (i == m_random)
                 {
-                    currentButtonPattern.Add(m_simonButtonReference[m_random]);
-                    m_modeBSimonButtons[j * 3 + i].SetProperties(m_simonButtonReference[m_random]);
-                } else
+                    currentButtonPattern.Add(uiManager.m_simonButtonReference[m_random]);
+                    uiManager.SetButtonProperty(m_currentIndex, m_random);
+                }
+                else
                 {
-                    m_modeBSimonButtons[j * 3 + i].SetProperties(m_simonButtonReference[(int)SIMON_BUTTON_TYPES.INCORRECT]);
+                    uiManager.SetButtonProperty(m_currentIndex, (int)UIManager.SIMON_BUTTON_TYPES.INCORRECT);
                 }
             }
         }
@@ -274,61 +268,22 @@ public class GameManager : MonoBehaviour {
         uiManager.ModeBMoveButtons();
 
         //Set next row index specifically for the button rows (since the transform moves, we must also adjust this to do along with it)
-        m_buttonRowIndex++; 
-        if (m_buttonRowIndex > 5)
-        {
-            m_buttonRowIndex = 0;
-        }
+        uiManager.IncrementButtonRowIndex();
 
         //We must place the animation after incrementing buttonRow index because it is inside a coroutine
         uiManager.MoveAnimationButtons();
     }
 
-    private void SetButtonInteractable()
-    {
-        //Disable current button interactable and enable on the next row
-        if (m_buttonRowIndex + 1 == m_buttonRowsModeB)
-        {
-            uiManager.SetButtonRowInteractive(0);
-        } else
-        {
-            uiManager.SetButtonRowInteractive(m_buttonRowIndex + 1);
-        }
-        //uiManager.m_startButtonAnimationModeB = true;
-     
-    }
-
     void SetNextButtonProperties()
     {
-        SetButtonInteractable();
+        uiManager.SetButtonInteractableModeB();
         //Move to next pattern
         currentButtonPattern.RemoveAt(0);
 
         //Set button colors on the top row
         int m_random = Random.Range(0, 3);
-
-        currentButtonPattern.Add(m_simonButtonReference[m_random]);
-        int m_startIndexOnTopRow = m_buttonRowIndex * 3;
-        int m_buttonTarget = (m_startIndexOnTopRow + m_random);
-
-        for (int i = m_startIndexOnTopRow; i < m_startIndexOnTopRow + 3; i++)    //Last row of buttons
-        {
-            if (currentState == GameState.UltraMode)
-            {
-                m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[i - m_startIndexOnTopRow]); 
-            }
-            else
-            {
-                if (i == (m_buttonTarget))
-                {
-                    m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[m_random]);
-                }
-                else
-                {
-                    m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[(int)SIMON_BUTTON_TYPES.INCORRECT]);
-                }
-            }
-        }
+        currentButtonPattern.Add(uiManager.m_simonButtonReference[m_random]);
+        uiManager.SetNextButtonProperties(m_random);
     }
 
     void SetEnemyDamage(int _damage)
@@ -518,11 +473,6 @@ public class GameManager : MonoBehaviour {
         return m_modeASimonButtons[Random.Range(0, m_modeASimonButtons.Length)];
     }
 
-    private int GetAnimationFromButton(int _buttonValue)
-    {
-        return (_buttonValue + 2);
-    }
-
     public bool SimonButtonHit(int _buttonValue)
     {
         if (currentState == GameState.PlayerInput)
@@ -535,9 +485,12 @@ public class GameManager : MonoBehaviour {
                 if(enemy.currentHealth <= 0)
                 {
                     GameOver(true);
+                } else if(_buttonValue == 5)
+                {
+                    m_animationManager.MainCharacterAttackRandom();
                 } else
                 {
-                    m_animationManager.MainCharacterPlayQueued(GetAnimationFromButton(_buttonValue));
+                    m_animationManager.MainCharacterAttackTypePlayQueued(_buttonValue);
                 }
                 uiManager.HitDamage(ComboMultiplier());
                 GainCombo(currentInputTime/inputTimePerPrompt);
@@ -575,6 +528,7 @@ public class GameManager : MonoBehaviour {
         }
         else if (currentState == GameState.UltraMode)
         {
+            m_animationManager.MainCharacterAttackRandom();
             ModeBCorrectButton();
             numUltraHits++;
             return true;
@@ -618,14 +572,17 @@ public class GameManager : MonoBehaviour {
 
     public void UltraButtonHit()
     {
-        if (currentState != GameState.UltraMode)
+        if (ultraLevel > 0)
         {
-            uiManager.UltraMode(true);
-            ActivateUltraMode();
-        }
-        else
-        {
-            numUltraHits++;
+            if (currentState != GameState.UltraMode)
+            {
+                uiManager.UltraMode(true);
+                ActivateUltraMode();
+            }
+            else
+            {
+                numUltraHits++;
+            }
         }
     }
 
@@ -667,35 +624,15 @@ public class GameManager : MonoBehaviour {
                 uiManager.SetUltraButtonInteractable(true);
             } else if(m_GameMode == (int)GAME_MODES.MODE_B)
             {
-                UltraActivateModeB();
                 uiManager.UltraMode(true);
                 ActivateUltraMode();
             }
         }
     }
 
-    private void UltraActivateModeB()
-    {
-      //  m_ultraModeB = new SimonButton[m_modeBSimonButtons.Length];
-        for (int j = 0; j < m_buttonRowsModeB; j++)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-               // m_ultraModeB[j * 3 + i] = new SimonButton(m_modeBSimonButtons[j * 3 + i]);
-                m_modeBSimonButtons[j * 3 + i].SetProperties(m_simonButtonReference[i]);
-            }
-        }
-    }
-
     private void DeactivateUltraModeB()
     {
-        for (int j = 0; j < m_buttonRowsModeB; j++)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                m_modeBSimonButtons[j * 3 + i].SetButtonValue(5);
-            }
-        }
+        uiManager.ToggleUltraModeB(false);
     }
 
     // ULTRA MODE !!!!
@@ -706,6 +643,9 @@ public class GameManager : MonoBehaviour {
         {
             StopCoroutine(patternRoutine);
             StopPlayerInput();
+        } else if(m_GameMode == (int)GAME_MODES.MODE_B)
+        {
+            uiManager.ToggleUltraModeB(true);
         }
     }
 
@@ -744,7 +684,6 @@ public class GameManager : MonoBehaviour {
     void GainCombo(float timeRatio)
     {
         int comboGained = Mathf.RoundToInt(Mathf.Lerp(MinComboGain, MaxComboGain, timeRatio));
-        print("Combo Gained -- " + comboGained);
         //currentComboLevel += comboGained;
 
         currentComboLevel += 1;

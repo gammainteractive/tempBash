@@ -55,7 +55,20 @@ public class UltraBar : MonoBehaviour {
         startDrainUltraLevel = GameManager.instance.ultraLevel;
         ultraDrainTime = (float) startDrainUltraLevel * GameManager.instance.DrainTimePerUltraLevel;
         currentDrainTime = ultraDrainTime;
+        EmptyOtherUltraFill();
         drainUltra = true;
+    }
+
+    private void EmptyOtherUltraFill()
+    {
+        if (m_currentUltraBar == 0)
+        {
+            m_ultraBar[1].fillAmount = 0;
+        }
+        else
+        {
+            m_ultraBar[0].fillAmount = 0;
+        }
     }
 
     /*void FillMeter(float ultraRatio)

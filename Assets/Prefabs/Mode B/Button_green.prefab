@@ -76,7 +76,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_buttonValue: 2
-  myImage: {fileID: 114385397616836764}
   m_actionIcon: {fileID: 224352584050311150}
   m_defaultButtonSprite: {fileID: 21300000, guid: 339d11c9d66fa7443b67b765af6e771e,
     type: 3}

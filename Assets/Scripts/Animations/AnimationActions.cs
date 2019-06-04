@@ -4,24 +4,25 @@ using UnityEngine;
 
 public class AnimationActions : QueuedAnimatedTiledTexture
 {
-    public int m_currentAnimation;
+    [HideInInspector]
+    protected int m_currentAnimation = -1;
 
     public CustomAnimationTextureModel[] m_animations;
 
     public virtual void PlayContinuously(int _animation)
     {
-        PlayQueued(_animation);
+        PlayQueued(_animation, false);
     }
 
-    public void PlayRandomQueued()
+    public virtual void PlayRandomQueued()
     {
-        int m_randomNumber = UnityEngine.Random.Range(2, m_animations.Length);
+        int m_randomNumber = UnityEngine.Random.Range(0, m_animations.Length);
         PlayQueued(m_randomNumber);
     }
 
-    public virtual void PlayQueued(int _animation)
+    public virtual void PlayQueued(int _animation, bool _playOnce = true)
     {
-        base.PlayOnce = true;
+        base.PlayOnce = _playOnce;
         CustomAnimationTextureModel _animToSet = m_animations[_animation];
         if (m_currentAnimation != _animation && !base.IsPlaying())
         {

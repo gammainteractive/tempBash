@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8721b9ae4ea582c4a82799aa4fcb636b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_buttonValue: 0
+  m_buttonValue: 1
   m_actionIcon: {fileID: 224257082014255634}
   m_defaultButtonSprite: {fileID: 21300000, guid: 88e30ec13bd0d3f4d816debc58bee8c3,
     type: 3}
