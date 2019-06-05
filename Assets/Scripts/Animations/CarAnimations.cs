@@ -106,6 +106,27 @@ public class CarAnimations : AnimationActions
         return 0;
     }
 
+    public void AttackAnimation()
+    {
+        _enemy.Attack();
+        switch (m_healthState)
+        {
+            case ((int)HEALTH_STATE.STATE_0):
+                OverrideAnimation((int)ANIMATIONS.ATTACK_0);
+                break;
+            case ((int)HEALTH_STATE.STATE_1):
+                OverrideAnimation((int)ANIMATIONS.ATTACK_1);
+                break;
+            case ((int)HEALTH_STATE.STATE_2):
+                OverrideAnimation((int)ANIMATIONS.ATTACK_2);
+                break;
+            case ((int)HEALTH_STATE.STATE_3):
+                OverrideAnimation((int)ANIMATIONS.ATTACK_3);
+                break;
+        }
+        m_isOnIdleAnimation = false;
+    }
+
     private void PlayIdleOnRepeat()
     {
         m_currentAnimation = GetCurrentIdleAnimation();

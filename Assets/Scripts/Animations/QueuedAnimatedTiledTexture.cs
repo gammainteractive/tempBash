@@ -42,6 +42,11 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
         base.ChangeMaterial(_material);
     }
 
+    public void StopAllAnimations()
+    {
+        StopAllCoroutines();
+    }
+
     public void Play()
     {
         StartCoroutine(IPlay());
@@ -72,4 +77,9 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
         f_updateTiling = StartCoroutine(updateTiling());
     }
     
+    public void StopCurrentAnimation()
+    {
+        StopCoroutine(f_updateTiling);
+    }
+
 }

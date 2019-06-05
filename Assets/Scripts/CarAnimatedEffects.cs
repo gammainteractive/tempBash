@@ -17,6 +17,13 @@ public class CarAnimatedEffects : AnimationActions {
     {
         m_enemy = GetComponentInParent<Enemy>();
         m_enemy.EnemyTakeHitHandle += PlayDefaultAnimation;
+        m_enemy.EnemyAttackHandle += StopAnimation;
+    }
+
+    private void StopAnimation()
+    {
+        StopClearAllAnimation();
+        PlayQueued((int)ANIMATIONS.NONE);
     }
 
     private void PlayDefaultAnimation()
@@ -28,7 +35,6 @@ public class CarAnimatedEffects : AnimationActions {
     {
         yield return new WaitForSeconds(m_animationDelay);
         PlayQueued((int)ANIMATIONS.DEFAULT);
-        PlayQueued((int)ANIMATIONS.NONE);
     }
 
 

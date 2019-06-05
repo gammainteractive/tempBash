@@ -45,7 +45,7 @@ public class SimonButton : MonoBehaviour
         //For reason these reset back to 0 when in game
         m_yOffsetPressed = 15;
         m_buttonPressedTime = 0.15f;
-
+        
         m_defaultPosition = new Vector2(m_actionIcon.anchoredPosition.x, m_actionIcon.anchoredPosition.y);
         myButton.onClick.AddListener(ButtonHit);
     }
@@ -83,7 +83,7 @@ public class SimonButton : MonoBehaviour
     void ButtonHit()
     {
         //Enable button hits when buttons are not animating or it will cause bugs
-        if (!UIManager.Instance.m_startButtonAnimationModeB){
+       // if (!UIManager.Instance.m_startButtonAnimationModeB){
             if (GameManager.instance.SimonButtonHit(m_buttonValue))
             {
                 StartCoroutine(CorrectButtonPress());
@@ -92,7 +92,7 @@ public class SimonButton : MonoBehaviour
             {
                 StartCoroutine(IncorrectButtonPress());
             }
-        }
+        //}
     }
 
     private IEnumerator CorrectButtonPress()

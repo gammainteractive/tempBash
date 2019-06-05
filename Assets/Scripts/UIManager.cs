@@ -44,7 +44,8 @@ public class UIManager : MonoBehaviour {
     public Transform m_ultraHitsText;
 
     #region Button Animations for mode B
-    public bool m_startButtonAnimationModeB = false;
+    // public bool m_startButtonAnimationModeB = false;
+    public SimonButton[] m_buttonInteractionsModeB;
     public Transform[] m_buttonRowsModeB;
     public SimonButton[] m_modeBSimonButtons;
     public List<SimonButton> m_simonButtonReference;
@@ -150,6 +151,7 @@ public class UIManager : MonoBehaviour {
     {
         if (_isEnable)
         {
+          
             for (int j = 0; j < m_buttonRowsModeB.Length; j++)
             {
                 for (int i = 0; i < 3; i++)
@@ -169,6 +171,7 @@ public class UIManager : MonoBehaviour {
                 }
             }
         }
+        SetInteractiveButtonProperties();
     }
 
     public void IncrementButtonRowIndex()
@@ -177,6 +180,30 @@ public class UIManager : MonoBehaviour {
         if (m_buttonRowIndex > 5)
         {
             m_buttonRowIndex = 0;
+        }
+    }
+
+    public void SetInteractiveButtonProperties()
+    {
+        int m_nextRowIndex = m_buttonRowIndex + 1;
+        if (m_nextRowIndex >= m_buttonRowsModeB.Length)
+        {
+            m_nextRowIndex -= m_buttonRowsModeB.Length;
+        }
+        SimonButton[] _buttons = m_buttonRowsModeB[m_nextRowIndex].GetComponentsInChildren<SimonButton>();
+
+        int m_index = m_buttonRowIndex * 3 + 3;
+
+        if (m_index >= m_modeBSimonButtons.Length)
+        {
+            m_index -= m_modeBSimonButtons.Length;
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            m_buttonInteractionsModeB[i].SetProperties(_buttons[i]);
+            // m_buttonInteractionsModeB[i].SetProperties(m_modeBSimonButtons[m_index + i]);
+
         }
     }
 
@@ -195,7 +222,7 @@ public class UIManager : MonoBehaviour {
             {
                 if (i == (m_buttonTarget))
                 {
-                    m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[_random]);
+                m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[_random]);
                 }
                 else
                 {
@@ -234,8 +261,8 @@ public class UIManager : MonoBehaviour {
 
     private IEnumerator IMoveAnimationButtons()
     {
-        m_startButtonAnimationModeB = true;
-        float timeToMove = 0.07f;
+       // m_startButtonAnimationModeB = true;
+        float timeToMove = 0.05f;
         var currentPos = transform.position;
         var t = 0f;
 
@@ -264,7 +291,7 @@ public class UIManager : MonoBehaviour {
             }
             yield return null;
         }
-        m_startButtonAnimationModeB = false;
+       // m_startButtonAnimationModeB = false;
     }
 
     public bool SetButtonRowInteractive(int _currentRow)

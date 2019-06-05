@@ -12,6 +12,7 @@ public class AnimationManager : MonoBehaviour {
 
     public void GameOverAnimations(bool _isWin)
     {
+        StopAllCoroutines();
         if (_isWin)
         {
             m_carAnimationRef.GameOver();
@@ -31,13 +32,16 @@ public class AnimationManager : MonoBehaviour {
     {
         m_mainCharacterAnimationRef.AttackTypePlayQueued(_attackType);
     }
-    public void MainCharacterAttackRandom()
-    {
-        m_mainCharacterAnimationRef.PlayRandomQueued();
-    }
 
     public void MissedInput()
     {
-        m_mainCharacterAnimationRef.PlayQueued((int)MainCharacterAnimations.ANIMATIONS.HURT);
+        StartCoroutine(IMissedInput());
+    }
+
+    private IEnumerator IMissedInput()
+    {
+        m_carAnimationRef.AttackAnimation();
+        yield return new WaitForSeconds(0.43f);
+        m_mainCharacterAnimationRef.PlayPriority((int)MainCharacterAnimations.ANIMATIONS.HURT);
     }
 }

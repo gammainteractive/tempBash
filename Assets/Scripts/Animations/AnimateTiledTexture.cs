@@ -31,6 +31,7 @@ public class AnimateTiledTexture : MonoBehaviour
     public delegate void VoidEvent();               // The Event delegate
     public List<VoidEvent> _voidEventCallbackList; // A list of functions we need to call if events are enabled
     protected Coroutine f_updateTiling;
+
     protected int m_ignoredAnimationFrames = 0;
 
     // Use this function to register your callback function with this script
@@ -58,8 +59,6 @@ public class AnimateTiledTexture : MonoBehaviour
         // If the animation is playing, stop it
         if (_isPlaying)
         {
-            Debug.Log("Stop playing");
-            //StopCoroutine("updateTiling");
             StopCoroutine(f_updateTiling);
             _isPlaying = false;
         }

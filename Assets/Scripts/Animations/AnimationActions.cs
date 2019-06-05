@@ -6,6 +6,7 @@ public class AnimationActions : QueuedAnimatedTiledTexture
 {
     [HideInInspector]
     protected int m_currentAnimation = -1;
+    private int m_maxQueuedAnimations = 3;
 
     public CustomAnimationTextureModel[] m_animations;
 
@@ -31,6 +32,10 @@ public class AnimationActions : QueuedAnimatedTiledTexture
         }
         else if (base.IsPlaying())
         {
+            if(m_queuedAnimations.Count > m_maxQueuedAnimations - 1)
+            {
+                base.m_queuedAnimations.RemoveAt(m_maxQueuedAnimations - 1);
+            }
             base.m_queuedAnimations.Add(_animToSet);
         }
         base.Play();
@@ -45,6 +50,21 @@ public class AnimationActions : QueuedAnimatedTiledTexture
     {
         CustomAnimationTextureModel m_customAnim = m_animations[_animation];
         base.ChangeCustomAnimationMaterial(m_customAnim.Material, m_customAnim.Rows, m_customAnim.Columns, m_customAnim.FrameSkips);
+    }
+
+    public void OverrideAnimation(int _animation, bool _playOnce = true)
+    {
+        StopClearAllAnimation();
+        CustomAnimationTextureModel m_customAnim = m_animations[_animation];
+        base.StopCurrentAnimation();
+        PlayQueued(_animation, _playOnce);
+    }
+
+    public void StopClearAllAnimation()
+    {
+        ClearAnimationQueues();
+        StopAllAnimations();
+        _isPlaying = false;
     }
 
     public void ClearAnimationQueues()

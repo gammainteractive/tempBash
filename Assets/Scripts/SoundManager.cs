@@ -6,6 +6,7 @@ public class SoundManager : MonoBehaviour {
 
     public AudioSource m_audio;
     public AudioClip[] m_clips;
+    public MainCharacterSounds m_mainCharacterSounds;
 
     public enum MUSIC
     {
@@ -27,5 +28,10 @@ public class SoundManager : MonoBehaviour {
     {
         m_audio.clip = m_clips[(int)MUSIC.TITLE];
         m_audio.Play();
+    }
+
+    public void MainCharacterPlaySound(int _clipNumber)
+    {
+        m_mainCharacterSounds.PlaySound(_clipNumber);
     }
 }

@@ -38,6 +38,15 @@ public class MainCharacterAnimations : AnimationActions {
         {
             PlayIdleOnRepeat();
         }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            PlayQueued(3);
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            GameManager.instance.GameOver(false);
+        }
     }
 
     //Button value or attack types depend on the button value definition on UIManager.
@@ -87,6 +96,13 @@ public class MainCharacterAnimations : AnimationActions {
         base.PlayQueued(_animation);
     }
 
+    public void PlayPriority(int _animation, bool _playOnce = true)
+    {
+        StopIdleAnimation();
+        m_queuedAnimations.Clear();
+        base.PlayQueued(_animation);
+    }
+
     public override void PlayContinuously(int _animation)
     {
         StopIdleAnimation();
@@ -101,9 +117,9 @@ public class MainCharacterAnimations : AnimationActions {
 
     private void PlayIdleOnRepeat()
     {
+        m_isOnIdleAnimation = true;
         m_currentAnimation = (int)ANIMATIONS.IDLE;
         base.PlayOnce = false;
-        m_isOnIdleAnimation = true;
         ChangeMaterial(m_animations[m_currentAnimation]);
         base.Play();
     }
@@ -111,17 +127,12 @@ public class MainCharacterAnimations : AnimationActions {
     public override void PlayRandomQueued()
     {
         int m_randomNumber = UnityEngine.Random.Range(2, m_animations.Length);
-        if(m_randomNumber == (int)ANIMATIONS.DEATH)
-        {
-            m_randomNumber++;
-        }
-        PlayQueued(m_randomNumber);
+        PlayQueued((int)GetAnimationFromAttackType(m_randomNumber));
     }
 
     public void GameOver()
     {
         m_disableIdleAnimation = true;
-       // ClearAnimationQueues();
-        PlayQueued((int)ANIMATIONS.DEATH);
+        OverrideAnimation((int)ANIMATIONS.DEATH);
     }
 }

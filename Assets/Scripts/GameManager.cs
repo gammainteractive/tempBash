@@ -93,9 +93,6 @@ public class GameManager : MonoBehaviour {
 
     public void StartGame()
     {
-#if !UNITY_EDITOR
-        m_isDebugMode = false;
-#endif
         if (StartGameHandle != null)
         {
             StartGameHandle.Invoke();
@@ -125,6 +122,11 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
 
+#if !UNITY_EDITOR
+        m_isDebugMode = false;
+#endif
+        Application.targetFrameRate = 120;
+
         uiManager.TitleView();
         currentNumPatterns = startNumPatterns;
        
@@ -132,12 +134,14 @@ public class GameManager : MonoBehaviour {
         promptDelay = StartPromptDelay;
         inputTimeDelta = (StartInputTime - MinInputTime) / InputsForMinInputTime;
         promptDelayDelta = (StartPromptDelay - MinPromptDelay) / InputsForMinPromptTime;
+        if (!m_isDebugMode)
+        {
+            InputsForUltraLevel = 20;
+        }
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKeyDown(KeyCode.F)) StopCoroutine(patternRoutine);
-
         if (m_GameMode == (int)GAME_MODES.MODE_A)
         {
             GameModeAUpdate();
@@ -149,6 +153,10 @@ public class GameManager : MonoBehaviour {
             && !m_isDebugMode)
         {
             player.TakeHit(Time.deltaTime + 0.5f);
+            if(player.currentHealth <= 0)
+            {
+                GameOver(false); return;
+            }
         }
     }
 
@@ -257,6 +265,12 @@ public class GameManager : MonoBehaviour {
             }
         }
 
+        for(int i = 0; i < 3; i++)
+        {
+            uiManager.m_buttonInteractionsModeB[i].SetProperties(uiManager.m_modeBSimonButtons[i + 3]);
+        }
+
+
         //Remove the first index because we actually use the 2nd row as first input for the player
         currentButtonPattern.RemoveAt(0);
     }
@@ -264,11 +278,12 @@ public class GameManager : MonoBehaviour {
     private void ModeBCorrectButton()
     {
         player.AddHealth(20);
-        SetNextButtonProperties();
+       
         uiManager.ModeBMoveButtons();
-
+        SetNextButtonProperties();
         //Set next row index specifically for the button rows (since the transform moves, we must also adjust this to do along with it)
         uiManager.IncrementButtonRowIndex();
+        uiManager.SetInteractiveButtonProperties();
 
         //We must place the animation after incrementing buttonRow index because it is inside a coroutine
         uiManager.MoveAnimationButtons();
@@ -276,7 +291,8 @@ public class GameManager : MonoBehaviour {
 
     void SetNextButtonProperties()
     {
-        uiManager.SetButtonInteractableModeB();
+        //uiManager.SetButtonInteractableModeB();
+
         //Move to next pattern
         currentButtonPattern.RemoveAt(0);
 
@@ -485,11 +501,12 @@ public class GameManager : MonoBehaviour {
                 if(enemy.currentHealth <= 0)
                 {
                     GameOver(true);
-                } else if(_buttonValue == 5)
+                } else if(_buttonValue == 5)    //This is when Ultra mode ends on mode B
                 {
-                    m_animationManager.MainCharacterAttackRandom();
+                    MainCharacterAttackRandom();
                 } else
                 {
+                    m_soundManager.MainCharacterPlaySound(_buttonValue);
                     m_animationManager.MainCharacterAttackTypePlayQueued(_buttonValue);
                 }
                 uiManager.HitDamage(ComboMultiplier());
@@ -526,9 +543,9 @@ public class GameManager : MonoBehaviour {
             }
             return correct;
         }
-        else if (currentState == GameState.UltraMode)
+        else if (currentState == GameState.UltraMode  && m_GameMode == (int)GAME_MODES.MODE_B)  //Mode A Ultra button is on UltraButtonHit
         {
-            m_animationManager.MainCharacterAttackRandom();
+            MainCharacterAttackRandom();
             ModeBCorrectButton();
             numUltraHits++;
             return true;
@@ -581,9 +598,17 @@ public class GameManager : MonoBehaviour {
             }
             else
             {
+                MainCharacterAttackRandom();
                 numUltraHits++;
             }
         }
+    }
+
+    private void MainCharacterAttackRandom()
+    {
+        int m_randomButtonValueNumber = UnityEngine.Random.Range(0, 2);
+        m_soundManager.MainCharacterPlaySound(m_randomButtonValueNumber);
+        m_animationManager.MainCharacterAttackTypePlayQueued(m_randomButtonValueNumber);
     }
 
     public void AddUltra(float amount)

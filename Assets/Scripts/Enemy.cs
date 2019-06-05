@@ -13,7 +13,7 @@ public class Enemy : LivingBody {
 
     public event EnemyTakeHitHandler EnemyTakeHitHandle;
 
-    public void TakeHit()
+    public void TakeHitHandle()
     {
         if (EnemyTakeHitHandle != null)
         {
@@ -21,7 +21,19 @@ public class Enemy : LivingBody {
         }
     }
 
-    protected override void Start () {
+    public delegate void EnemyAttackHandler();
+
+    public event EnemyAttackHandler EnemyAttackHandle;
+
+    public void AttackHandle()
+    {
+        if (EnemyAttackHandle != null)
+        {
+            EnemyAttackHandle.Invoke();
+        }
+    }
+
+    protected override void Start() {
         base.Start();
     }
 
@@ -29,6 +41,11 @@ public class Enemy : LivingBody {
     {
         base.TakeHit(hitAmount);
         m_currentHealthPercent = (int)((base.currentHealth / base.maxHealth) * 100);
-        TakeHit();
+        TakeHitHandle();
+    }
+
+    public void Attack()
+    {
+        AttackHandle();
     }
 }
