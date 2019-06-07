@@ -77,7 +77,6 @@ public class UltraButton : MonoBehaviour
                 coolDown = false;
                 m_ultraFillImage.fillAmount = 1;
                 m_ultraFillButton.interactable = true;
-                GameManager.instance.dangerMode = false;
             }
         }
     }

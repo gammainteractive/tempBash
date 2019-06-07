@@ -19,7 +19,8 @@ public class UIManager : MonoBehaviour {
     public enum GAME_MODE_VIEW
     {
         MODE_A,
-        MODE_B
+        MODE_B,
+        MODE_C,
     }
 
     public enum SIMON_BUTTON_TYPES
@@ -39,9 +40,14 @@ public class UIManager : MonoBehaviour {
     public WatchPrompt promptText;
     public DamageText damageText;
     public GameObject gameOver;
+    public GameObject m_youWin;
+    public GameObject m_youLose;
+    public FadeUI m_missText;
     public GameObject restartButton;
     public DamageModifierText m_damageModifier;
     public Transform m_ultraHitsText;
+
+    public PhasesUI m_phaseUI;
 
     #region Button Animations for mode B
     // public bool m_startButtonAnimationModeB = false;
@@ -66,7 +72,6 @@ public class UIManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         ActivateTimerBar(false);
-        restartButton.SetActive(false);
         InitDefaultPositions();
     }
 
@@ -97,21 +102,43 @@ public class UIManager : MonoBehaviour {
         enemyHealth.UpdateHealthText(_value);
     }
 
-    public void SetGameOver(bool winner)
+    public void SetGameOver(bool _winner)
     {
-        
-        if (winner)
+        gameOver.SetActive(true);
+        if (_winner)
         {
-            gameOver.GetComponentInChildren<TextMeshProUGUI>(true).text = "Game Over\n<color=yellow>You Win";
+            m_youWin.SetActive(true);
         }
         else
         {
-            gameOver.GetComponentInChildren<TextMeshProUGUI>(true).text = "Game Over\nYou Lose";
+            m_youLose.SetActive(true);
             playerHealth.UpdateHealthBar(0, 100);
         }
-        gameOver.SetActive(true);
-        restartButton.SetActive(true);
        
+    }
+
+    public void ResetUI(int _mode)
+    {
+        ResetDefaultPositions();
+
+        if (_mode == 1)
+        {
+            for (int i = 0; i < m_buttonRowsModeB.Length; i++)
+            {
+                m_buttonRowsModeB[i].localPosition = m_defaultButtonPositionModeB[i];
+                m_buttonRowsModeB[i].localScale = m_defaultButtonScaleModeB[i];
+            }
+        }
+        gameOver.SetActive(false);
+        m_youWin.SetActive(false);
+        m_youLose.SetActive(false);
+        m_buttonRowIndex = 0;
+    }
+
+    public void ShowMiss()
+    {
+        m_missText.ShowText();
+        m_missText.StartFade();
     }
 
     public void UltraMode(bool modeOn)
@@ -229,6 +256,24 @@ public class UIManager : MonoBehaviour {
                     m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[(int)SIMON_BUTTON_TYPES.INCORRECT]);
                 }
             }
+        }
+    }
+
+    private void ResetDefaultPositions()
+    {
+        m_targetButtonPositionsModeB.Clear();
+        m_targetButtonScaleModeB.Clear();
+        m_buttonRowsModeBCurrentPosition.Clear();
+        m_buttonRowsModeBCurrentScale.Clear();
+
+        for (int i = 0; i < m_buttonRowsModeB.Length; i++)
+        {
+            Vector2 _defaultPosition = m_defaultButtonPositionModeB[i];
+            Vector2 _defaultScale = m_defaultButtonScaleModeB[i];
+            m_targetButtonPositionsModeB.Add(_defaultPosition);
+            m_targetButtonScaleModeB.Add(_defaultScale);
+            m_buttonRowsModeBCurrentPosition.Add(_defaultPosition);
+            m_buttonRowsModeBCurrentScale.Add(_defaultScale);
         }
     }
 
@@ -393,6 +438,21 @@ public class UIManager : MonoBehaviour {
     public void UltraTextSetActive(bool ready)
     {
         m_ultraHitsText.gameObject.SetActive(ready);
+    }
+
+    public void ShowModeCResult(bool _isSuccess)
+    {
+        m_phaseUI.ShowModeCResult(_isSuccess);
+    }
+
+    public void ShowUIPhase(int _phase)
+    {
+        m_phaseUI.ShowPhase(_phase);
+    }
+
+    public void HideUIPhases()
+    {
+        m_phaseUI.DisableAllObjects();
     }
 
     public void SetUltraLevelText(int ultraLevel)

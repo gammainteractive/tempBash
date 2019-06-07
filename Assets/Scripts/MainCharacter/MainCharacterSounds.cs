@@ -9,6 +9,10 @@ public class MainCharacterSounds : MonoBehaviour {
         PUNCH,
         KICK,
         SPECIAL,
+        CAT_SPECIAL = 3,
+        ELEPHANT_SPECIAL = 4,
+        MONKEY_SPECIAL = 5,
+        PENGUIN_SPECIAL = 6,
     }
 
     public AudioSource m_audio;

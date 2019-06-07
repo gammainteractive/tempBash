@@ -16,7 +16,8 @@ public class UltraBar : MonoBehaviour {
     public float ultraDrainTime;
     public float currentDrainTime;
     public int startDrainUltraLevel;
-
+    private int m_ultraTimeBonus = 2;
+    private float m_totalDrainTime = 0;
 
     // Use this for initialization
     void Start () {
@@ -36,7 +37,7 @@ public class UltraBar : MonoBehaviour {
             if (currentDrainTime > 0)
             {
                 currentDrainTime -= Time.deltaTime;
-                SetUltraBarFill(currentDrainTime / ultraDrainTime);
+                SetUltraBarFill(currentDrainTime / m_totalDrainTime);
             } else
             {
                 UltraEnded();
@@ -54,7 +55,8 @@ public class UltraBar : MonoBehaviour {
     {
         startDrainUltraLevel = GameManager.instance.ultraLevel;
         ultraDrainTime = (float) startDrainUltraLevel * GameManager.instance.DrainTimePerUltraLevel;
-        currentDrainTime = ultraDrainTime;
+        currentDrainTime = ultraDrainTime + m_ultraTimeBonus;
+        m_totalDrainTime = currentDrainTime;
         EmptyOtherUltraFill();
         drainUltra = true;
     }

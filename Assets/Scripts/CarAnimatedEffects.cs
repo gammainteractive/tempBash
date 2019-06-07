@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CarAnimatedEffects : AnimationActions {
+public class CarAnimatedEffects : AnimationActions
+{
 
     private float m_animationDelay = 0.4f;
     private Enemy m_enemy;
+    private Material m_material;
 
     public enum ANIMATIONS
     {
@@ -24,6 +26,7 @@ public class CarAnimatedEffects : AnimationActions {
     {
         StopClearAllAnimation();
         PlayQueued((int)ANIMATIONS.NONE);
+        StopClearAllAnimation();
     }
 
     private void PlayDefaultAnimation()
@@ -34,9 +37,17 @@ public class CarAnimatedEffects : AnimationActions {
     private IEnumerator IPlayDefaultAnimation()
     {
         yield return new WaitForSeconds(m_animationDelay);
+        ToggleEffectsView(true);
         PlayQueued((int)ANIMATIONS.DEFAULT);
+        while (IsPlaying())
+        {
+            yield return null;
+        }
+        ToggleEffectsView(false);
     }
 
-
-
+    private void ToggleEffectsView(bool _isEnable)
+    {
+        GetComponent<Renderer>().enabled = _isEnable;
+    }
 }

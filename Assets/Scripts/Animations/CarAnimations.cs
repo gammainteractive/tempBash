@@ -146,7 +146,12 @@ public class CarAnimations : AnimationActions
         yield return new WaitForSeconds(0.4f);
         m_disableIdleAnimation = true;
         yield return new WaitForSeconds(0.2f);
-        PlayQueued((int)ANIMATIONS.DEATH);
+        OverrideAnimation((int)ANIMATIONS.DEATH);
     }
-    
+
+    public void Reset()
+    {
+        m_disableIdleAnimation = false;
+    }
+
 }

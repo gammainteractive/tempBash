@@ -52,7 +52,7 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
         StartCoroutine(IPlay());
     }
 
-    public override IEnumerator IPlay()
+    public IEnumerator IPlay()
     {
         if (m_isQueueMoves)
         {

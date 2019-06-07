@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: street-fighter-alpha-3-medium SDF
   m_EditorClassIdentifier: 
   hashCode: -726994519
-  material: {fileID: 21608396640936140}
-  materialHashCode: -783787518
+  material: {fileID: 21418250280209610}
+  materialHashCode: -218548144
   fontAssetType: 1
   m_fontInfo:
     Name: Street Fighter Alpha 3 (Medium)
@@ -37,7 +37,7 @@ MonoBehaviour:
     Padding: 5
     AtlasWidth: 512
     AtlasHeight: 512
-  atlas: {fileID: 28354227759591910}
+  atlas: {fileID: 28885752219167896}
   m_glyphInfoList:
   - id: 32
     x: 6
@@ -942,13 +942,13 @@ MonoBehaviour:
   boldSpacing: 7
   italicStyle: 35
   tabSize: 10
---- !u!21 &21608396640936140
+--- !u!21 &21418250280209610
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: street-fighter-alpha-3-medium SDF Material
+  m_Name: street-fighter-alpha-3-medium SDF 2 Material
   m_Shader: {fileID: 4800000, guid: dca26082f9cb439469295791d9f76fe5, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -973,7 +973,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 28354227759591910}
+        m_Texture: {fileID: 28885752219167896}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OutlineTex:
@@ -1041,12 +1041,12 @@ Material:
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
---- !u!28 &28354227759591910
+--- !u!28 &28885752219167896
 Texture2D:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: street-fighter-alpha-3-medium SDF Atlas
+  m_Name: street-fighter-alpha-3-medium SDF 2 Atlas
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000

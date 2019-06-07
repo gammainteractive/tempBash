@@ -21,6 +21,14 @@ public class AnimationActions : QueuedAnimatedTiledTexture
         PlayQueued(m_randomNumber);
     }
 
+    public void PlayCurrentQueueOnly(CustomAnimationTextureModel _animation, bool _playOnce = true)
+    {
+        base.PlayOnce = _playOnce;
+        m_currentAnimation = -1;
+        ChangeMaterial(_animation);
+        base.Play();
+    }
+
     public virtual void PlayQueued(int _animation, bool _playOnce = true)
     {
         base.PlayOnce = _playOnce;

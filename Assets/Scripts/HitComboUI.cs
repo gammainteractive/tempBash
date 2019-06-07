@@ -6,24 +6,26 @@ using TMPro;
 
 public class HitComboUI : MonoBehaviour {
 
-    TextMeshProUGUI comboText;
-    string comboFormat = "{0} Hits!!";
+    public GameObject m_comboTextContainer;
+    public TextMeshProUGUI comboText;
+    string comboFormat = " <color=white>{0}</color>";
+   
+    string m_damageFormat = "<color=white>{0}</color><color=yellow>x</color><br><color=red>HIT</color>";
 
-	// Use this for initialization
-	void Start () {
-        comboText = GetComponentInChildren<TextMeshProUGUI>();
-        SetHitCombo(1);
-        ActivateHitCombo(false);
+    // Use this for initialization
+    void Start () {
+#if UNITY_EDITOR
+        ActivateHitCombo(true);
+        Debug.Log("Combo activated from Debug");
+#else
+          ActivateHitCombo(false);
+#endif
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public void ActivateHitCombo(bool active)
     {
-        comboText.enabled = active;
+        m_comboTextContainer.SetActive(active);
+        //comboText.enabled = active;
     }
 
     public void SetHitCombo(int hitCombo)
