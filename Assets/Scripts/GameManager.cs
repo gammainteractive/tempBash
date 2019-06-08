@@ -802,7 +802,6 @@ public class GameManager : MonoBehaviour {
             {
                 if (currentState != GameState.UltraMode)
                 {
-                    Debug.Log("Ultra Button hit");
                     uiManager.UltraMode(true);
                     ActivateUltraMode();
                     uiManager.UltraEffectsToggle(true);
@@ -857,8 +856,11 @@ public class GameManager : MonoBehaviour {
             {
                 uiManager.UpdateUltraFill(1);
                 uiManager.AddUltraBar();
-                uiManager.UpdateUltraFill(m_ultraCurrentAmount - 1);
+              
                 m_ultraCurrentAmount -= 1;
+                if(m_GameMode == (int)GAME_MODES.MODE_C){
+                    uiManager.UltraButtonToggle(true);
+                }
             }
             
         } else
@@ -874,7 +876,6 @@ public class GameManager : MonoBehaviour {
                 uiManager.SetUltraButtonInteractable(true);
             } else if(m_GameMode == (int)GAME_MODES.MODE_B)
             {
-                Debug.Log("Ultra mode B");
                 uiManager.UltraMode(true);
                 ActivateUltraMode();
             }
@@ -903,12 +904,19 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    //Ultra End for Mode C
     private IEnumerator IUltraEnded()
     {
+        currentNumPatterns = 0;
+        currentButtonPattern.Clear();
+        uiManager.UltraButtonToggle(false);
         uiManager.ShowUltraDamage(true);
         currentState = GameState.DisplayPattern;
         yield return new WaitForSeconds(3.0f);
         uiManager.ShowUltraDamage(false);
+        currentComboLevel = 0;
+        SetDamageModifier(currentComboLevel);
+        uiManager.ActivateHitCombo(false);
         m_isProcessResults = true;
         EventProcessResults();
     }
@@ -922,6 +930,7 @@ public class GameManager : MonoBehaviour {
         uiManager.ResetUltraBar();
         int totalDamage = ComboMultiplier() * numUltraHits;
         enemy.TakeHit(totalDamage);
+
         if (enemy.currentHealth <= 0)
         {
             if (m_GameMode == (int)GAME_MODES.MODE_C)
@@ -937,18 +946,20 @@ public class GameManager : MonoBehaviour {
             m_buttonPressesModeC.Clear();
             StartCoroutine(IUltraEnded());
         }
+
         uiManager.SetDamageText(ComboMultiplier(), numUltraHits, totalDamage);
         numUltraHits = 0;
 
         if (m_GameMode == (int)GAME_MODES.MODE_A)
         {
-            uiManager.SetUltraButtonInteractable(false);
+          /*  uiManager.SetUltraButtonInteractable(false);
             uiManager.SetReadyCooldown();
-            StartPattern(startNumPatterns, true);
+            StartPattern(startNumPatterns, true);*/
         } else if (m_GameMode == (int)GAME_MODES.MODE_B)
         {
             DeactivateUltraModeB();
             currentState = GameState.PlayerInput;
+        
         }
        
         //inputTimePerPrompt = StartInputTime;

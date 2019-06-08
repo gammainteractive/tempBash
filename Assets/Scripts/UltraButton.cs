@@ -67,7 +67,7 @@ public class UltraButton : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (coolDown
+        /*if (coolDown
             && GameManager.instance.currentState != GameManager.GameState.GameOver
             && m_startCooldown)
         {
@@ -82,7 +82,19 @@ public class UltraButton : MonoBehaviour
                 m_ultraFillImage.fillAmount = 1;
                 m_ultraFillButton.interactable = true;
             }
+        }*/
+    }
+
+    public void ToggleUltraFillButton(bool _isEnable)
+    {
+        if (_isEnable)
+        {
+            m_ultraFillImage.fillAmount = 1;
+        } else
+        {
+            m_ultraFillImage.fillAmount = 0;
         }
+        m_ultraFillButton.interactable = _isEnable;
     }
 
     public void ActionIconAdjust(bool _isDefault)

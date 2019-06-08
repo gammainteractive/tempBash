@@ -526,4 +526,9 @@ public class UIManager : MonoBehaviour {
     {
         ultraButton.UltraEffectsToggle(_enable);
     }
+
+    public void UltraButtonToggle(bool _enable)
+    {
+        ultraButton.ToggleUltraFillButton(_enable);
+    }
 }
