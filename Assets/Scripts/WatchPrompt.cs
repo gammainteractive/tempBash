@@ -11,27 +11,22 @@ public class WatchPrompt : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
-        promptText = GetComponentInChildren<TextMeshProUGUI>();
-        ActivatePromptText(false);
+       // promptText = GetComponentInChildren<TextMeshProUGUI>();
+       // ActivatePromptText(false);
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public void ActivatePromptText(bool active)
     {
-        promptText.enabled = active;
+       // promptText.enabled = active;
     }
 
     public void Prompt()
     {
-        promptText.text = promptMessage;
+        //promptText.text = promptMessage;
     }
     public void Input()
     {
-        promptText.text = inputMessage;
+       // promptText.text = inputMessage;
     }
 
 

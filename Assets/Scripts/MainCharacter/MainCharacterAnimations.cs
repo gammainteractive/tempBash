@@ -23,7 +23,7 @@ public class MainCharacterAnimations : AnimationActions {
     }
 
     public bool m_isOnIdleAnimation = false;
-    protected bool m_disableIdleAnimation = false;
+    public bool m_disableIdleAnimation = false;
     public UltraAnimations m_ultraAnimations;
     public Material m_material;
 
@@ -36,15 +36,6 @@ public class MainCharacterAnimations : AnimationActions {
         {
             PlayIdleOnRepeat();
         }
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            PlayCurrentQueueOnly();
-        }
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            GameManager.instance.GameOver(false);
-        }
     }
 
     //Button value or attack types depend on the button value definition on UIManager.
@@ -54,27 +45,12 @@ public class MainCharacterAnimations : AnimationActions {
         StopIdleAnimation();
         int m_animation = 0;
         m_animation = (int)GetAnimationFromAttackType(_attackType);
-        base.PlayQueued(m_animation);
+        PlayQueued(m_animation);
     }
 
     public void MainCharacterAttackUltra(int _animation)
     {
-        StartCoroutine(UltraAttack(_animation));
-    }
-
-    private IEnumerator UltraAttack(int _animation)
-    {
-        while (m_ultraAnimations.IsPlaying())
-        {
-            yield return null;
-        }
-        m_ultraAnimations.GetComponent<Renderer>().enabled = true;
-        m_ultraAnimations.PlayUltra(_animation);
-        while (m_ultraAnimations.IsPlaying())
-        {
-            yield return null;
-        }
-        m_ultraAnimations.GetComponent<Renderer>().enabled = false;
+        m_ultraAnimations.PlayUltraAnimations(_animation);
     }
 
     private void ToggleCharacterView(bool _isEnable)
@@ -91,27 +67,6 @@ public class MainCharacterAnimations : AnimationActions {
 
         m_material.color = _temp;
     }
-
-   /* public int GetSoundsFXAttack(int _randomNum)
-    {
-        if (_randomNum == 0)
-        {
-            return (int)ANIMATIONS.CAT_SPECIAL;
-        }
-        else if (_randomNum == 1)
-        {
-            return (int)ANIMATIONS.ELEPHANT_SPECIAL;
-        }
-        else if (_randomNum == 2)
-        {
-            return (int)ANIMATIONS.MONKEY_SPECIAL;
-        }
-        else if (_randomNum == 3)
-        {
-            return (int)ANIMATIONS.PENGUIN_SPECIAL;
-        }
-        return 0;
-    }*/
 
     public void Reset()
     {
@@ -156,40 +111,35 @@ public class MainCharacterAnimations : AnimationActions {
         m_ultraAnimations.PlayUltra(_animation - 10);
     }
 
-    public void PlayQueuedAnimations()
-    {
-        StopIdleAnimation();
-        for (int i = 0; i < m_queuedAnimations.Count; i++)
-        {
-            base.Play();
-        }
-    }
-
     //Special for mode C, we can queue with no limit
     public void AddQueuedAnimations(int _animation)
     {
-        int m_temp = (int)GetAnimationFromAttackType(_animation);
-        CustomAnimationTextureModel _animToSet = m_animations[m_temp];
-        base.m_queuedAnimations.Add(_animToSet);
+        if (m_queuedAnimations.Count < 4)
+        { 
+            int m_temp = (int)GetAnimationFromAttackType(_animation);
+            CustomAnimationTextureModel _animToSet = m_animations[m_temp];
+            base.m_queuedAnimations.Add(_animToSet);
+        }
     }
 
-    public void PlayCurrentQueueOnly()
+    public void StopUltraAnimations()
     {
-        StopIdleAnimation();
-        base.PlayCurrentQueueOnly(m_queuedAnimations[0]); 
+        StartCoroutine(IStopUltraAnimations());
     }
 
-    public override void PlayQueued(int _animation, bool _playOnce = true)
+    private IEnumerator IStopUltraAnimations()
     {
         StopIdleAnimation();
-        base.PlayQueued(_animation);
+        m_ultraAnimations.StopCurrentAnimation();
+        yield return new WaitForSeconds(2.3f);
+        //LastAnimationQueueEvent();
     }
 
     public void PlayPriority(int _animation, bool _playOnce = true)
     {
         StopIdleAnimation();
         m_queuedAnimations.Clear();
-        base.PlayQueued(_animation);
+        PlayQueued(_animation);
     }
 
     public override void PlayContinuously(int _animation)
@@ -217,5 +167,66 @@ public class MainCharacterAnimations : AnimationActions {
     {
         m_disableIdleAnimation = true;
         OverrideAnimation((int)ANIMATIONS.DEATH);
+    }
+
+    public override void PlayQueued(int _animation, bool _playOnce = true)
+    {
+        StopIdleAnimation();
+        base.PlayOnce = _playOnce;
+        CustomAnimationTextureModel _animToSet = m_animations[_animation];
+        if (m_currentAnimation != _animation && !IsPlaying())
+        {
+            m_currentAnimation = _animation;
+            ChangeMaterial(_animToSet);
+        }
+        else if (IsPlaying())
+        {
+            if (m_queuedAnimations.Count > 3)
+            {
+                m_queuedAnimations.RemoveAt(2);
+            }
+            m_queuedAnimations.Add(_animToSet);
+        }
+        Play();
+    }
+
+    public override void Play()
+    {
+        StartCoroutine(IPlayMainCharacter());
+    }
+
+    public IEnumerator IPlayMainCharacter()
+    {
+        while (_isPlaying)
+        {
+            yield return null;
+        }
+        _isPlaying = true;
+        CustomAnimationTextureModel m_temp = null;
+        if (m_queuedAnimations.Count > 0)
+        {
+            m_temp = m_queuedAnimations[0];
+            ChangeCustomAnimationMaterial(m_temp.Material, m_temp.Rows, m_temp.Columns, m_temp.FrameSkips);
+        }
+
+       /* if(m_queuedAnimations.Count == 0)
+        {
+            LastAnimationQueueEvent();
+        }*/
+        // Make sure the renderer is enabled
+        GetComponent<Renderer>().enabled = true;
+
+        //Because of the way textures calculate the y value, we need to start at the max y value
+        _index = _columns;
+
+        // Start the update tiling coroutine
+        yield return StartCoroutine(updateTiling());
+
+        m_queuedAnimations.Remove(m_temp);
+        if (m_queuedAnimations.Count == 0)
+        {
+            LastAnimationQueueEvent();
+        }
+        _isPlaying = false;
     }
 }

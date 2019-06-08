@@ -46,6 +46,8 @@ public class UIManager : MonoBehaviour {
     public GameObject restartButton;
     public DamageModifierText m_damageModifier;
     public Transform m_ultraHitsText;
+    public GameObject m_ultraDamageModal;
+    public Sprite m_ultraIcon;
 
     public PhasesUI m_phaseUI;
 
@@ -184,7 +186,10 @@ public class UIManager : MonoBehaviour {
                 for (int i = 0; i < 3; i++)
                 {
                     // m_ultraModeB[j * 3 + i] = new SimonButton(m_modeBSimonButtons[j * 3 + i]);
-                    m_modeBSimonButtons[j * 3 + i].SetProperties(m_simonButtonReference[i]);
+                  
+                    m_modeBSimonButtons[j * 3 + i].SetProperties(m_simonButtonReference[i], true);
+                    m_modeBSimonButtons[j * 3 + i].SetUltraIcon(m_ultraIcon);
+                    m_modeBSimonButtons[j * 3 + i].ToggleUltraEffects(true);
                 }
             }
         }
@@ -194,7 +199,9 @@ public class UIManager : MonoBehaviour {
             {
                 for (int i = 0; i < 3; i++)
                 {
+                    m_modeBSimonButtons[j * 3 + i].SetUltraIcon(m_ultraIcon);
                     m_modeBSimonButtons[j * 3 + i].SetButtonValue(5);
+                    m_modeBSimonButtons[j * 3 + i].ToggleUltraEffects(false);
                 }
             }
         }
@@ -243,7 +250,7 @@ public class UIManager : MonoBehaviour {
         {
             if (GameManager.instance.currentState == GameManager.GameState.UltraMode)
             {
-                m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[i - m_startIndexOnTopRow]);
+                m_modeBSimonButtons[i].SetProperties(m_simonButtonReference[i - m_startIndexOnTopRow], true);
             }
             else
             {
@@ -416,6 +423,10 @@ public class UIManager : MonoBehaviour {
             m_gameModeViews[i].gameObject.SetActive(false);
         }
         m_gameModeViews[(int)_gameViewMode].gameObject.SetActive(true);
+        /*foreach(SimonButton _button in m_modeBSimonButtons)
+        {
+            _button.Initialize();
+        }*/
     }
 
 
@@ -444,6 +455,12 @@ public class UIManager : MonoBehaviour {
     {
         m_phaseUI.ShowModeCResult(_isSuccess);
     }
+
+    public void ShowUltraDamage(bool _isShow)
+    {
+        m_ultraDamageModal.SetActive(_isShow);
+    }
+
 
     public void ShowUIPhase(int _phase)
     {
@@ -503,5 +520,10 @@ public class UIManager : MonoBehaviour {
     public void ActivateTimerBar(bool active)
     {
         timerBar.ActivateTimer(active);
+    }
+
+    public void UltraEffectsToggle(bool _enable)
+    {
+        ultraButton.UltraEffectsToggle(_enable);
     }
 }

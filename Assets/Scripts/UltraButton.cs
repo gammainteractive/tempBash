@@ -7,18 +7,20 @@ using TMPro;
 public class UltraButton : MonoBehaviour
 {
     public GameObject m_ultraGO;
-    Button m_ultraButton;
-
+    public GameObject m_ultraEffects;
     public GameObject m_ultraFillGO;
-    Image m_ultraFillImage;
-    Button m_ultraFillButton;
-   
-
+    public RectTransform m_actionIcon;
     public bool coolDown;
     public float ultraCooldownTime;
-    float currentTime;
-
     public bool m_startCooldown = false;
+    public Animator m_animator;
+
+    private float m_yOffsetPressed = 15f;
+    private Vector2 m_defaultPosition;
+    private Image m_ultraFillImage;
+    private Button m_ultraFillButton;
+    private Button m_ultraButton;
+    private float currentTime;
 
     // Use this for initialization
     void Awake()
@@ -34,7 +36,9 @@ public class UltraButton : MonoBehaviour
 
     private void Start()
     {
-        SetUltraButtonInteractable(false);  
+        SetUltraButtonInteractable(false);
+        m_defaultPosition = new Vector2(m_actionIcon.anchoredPosition.x, m_actionIcon.anchoredPosition.y);
+
         GameManager.instance.StartGameHandle += () => {
             StartUltraCooldown();
         };
@@ -81,6 +85,18 @@ public class UltraButton : MonoBehaviour
         }
     }
 
+    public void ActionIconAdjust(bool _isDefault)
+    {
+        if (_isDefault)
+        {
+            m_actionIcon.anchoredPosition = m_defaultPosition;
+        }
+        else
+        {
+            m_actionIcon.anchoredPosition = m_defaultPosition + new Vector2(0, -m_yOffsetPressed);
+        }
+    }
+
     public void HitUltraButton()
     {
         GameManager.instance.UltraButtonHit();
@@ -90,6 +106,12 @@ public class UltraButton : MonoBehaviour
     {
         coolDown = true;
         currentTime = 0;
+    }
+
+    public void UltraEffectsToggle(bool _isEnable)
+    {
+        m_ultraEffects.SetActive(_isEnable);
+        m_animator.SetBool("UltraEffects", _isEnable);
     }
 
     public void SetUltraButtonInteractable(bool interact)

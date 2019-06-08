@@ -55,16 +55,6 @@ public class AnimationManager : MonoBehaviour {
         m_mainCharacterAnimationRef.AddQueuedAnimations(_animation);
     }
 
-    public void PlayQueuedAnimations()
-    {
-        m_mainCharacterAnimationRef.PlayQueuedAnimations();
-    }
-
-    public void PlayCurrentQueueOnly()
-    {
-        m_mainCharacterAnimationRef.PlayCurrentQueueOnly();
-    }
-
     public int GetMainCharacterQueuedMovesCount()
     {
         return m_mainCharacterAnimationRef.m_queuedAnimations.Count;
@@ -75,10 +65,9 @@ public class AnimationManager : MonoBehaviour {
         return m_mainCharacterAnimationRef.IsPlaying();
     }
 
-    public void GetMainCharacterPlayCurrentAnimation()
+    public void StopUltraAnimations()
     {
-       // m_mainCharacterAnimationRef.QueueMoves = false;
-      //  m_mainCharacterAnimationRef.Play();
+        m_mainCharacterAnimationRef.StopUltraAnimations();
     }
 
     private IEnumerator IMissedInput()

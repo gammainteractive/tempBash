@@ -9,9 +9,11 @@ using UnityEngine.UI;
 public class SimonButton : MonoBehaviour
 {
     public int m_buttonValue = 0;
+    public GameObject m_buttonTarget;
     Image myImage;
     Button myButton;
     public RectTransform m_actionIcon;
+    public Image m_actionImage;
     private Vector2 m_defaultPosition;
     private float m_yOffsetPressed = 15f;
     private float m_buttonPressedTime = 0.15f;
@@ -19,8 +21,12 @@ public class SimonButton : MonoBehaviour
     public Sprite m_ButtonWhenShowingPattern;
     public Sprite m_ButtonWhenPressed;
     public Sprite m_ButtonIncorrect;
+    private Sprite m_defaultIcon;
 
     public Sprite[] m_ButtonColors;
+
+    public GameObject m_ultraEffects;
+    public Animator m_ultraEffectsAnimator;
 
     public SimonButton(SimonButton _button)
     {
@@ -34,14 +40,15 @@ public class SimonButton : MonoBehaviour
 
 	// Use this for initialization
 	void Awake () {
-        myImage = GetComponent<Image>();
-        myButton = GetComponent<Button>();
-        //buttonColor = myImage.color;
-        m_defaultButtonSprite = GetComponent<Image>().sprite;
+        myImage = m_buttonTarget.GetComponent<Image>();
+        myButton = m_buttonTarget.GetComponent<Button>();
+        m_defaultButtonSprite = m_buttonTarget.GetComponent<Image>().sprite;
+        m_defaultIcon = m_actionImage.sprite;
     }
 
     private void Start()
     {
+        m_ultraEffects.SetActive(false);
         //For reason these reset back to 0 when in game
         m_yOffsetPressed = 15;
         m_buttonPressedTime = 0.15f;
@@ -49,6 +56,20 @@ public class SimonButton : MonoBehaviour
         m_defaultPosition = new Vector2(m_actionIcon.anchoredPosition.x, m_actionIcon.anchoredPosition.y);
         myButton.onClick.AddListener(ButtonHit);
     }
+
+   /* public void Initialize()
+    {
+        m_actionImage = m_actionIcon.GetComponent<Image>();
+        m_ultraEffectsAnimator = GetComponentInChildren<Animator>();
+        m_ultraEffects = m_ultraEffectsAnimator.gameObject;
+        m_ultraEffects.SetActive(false);
+        //For reason these reset back to 0 when in game
+        m_yOffsetPressed = 15;
+        m_buttonPressedTime = 0.15f;
+
+        m_defaultPosition = new Vector2(m_actionIcon.anchoredPosition.x, m_actionIcon.anchoredPosition.y);
+        myButton.onClick.AddListener(ButtonHit);
+    }*/
 
     private void InitializeView()
     {
@@ -60,12 +81,26 @@ public class SimonButton : MonoBehaviour
         StartCoroutine(ButtonAlert());
     }
 
-    public void SetProperties(SimonButton _simonButton)
+    public void SetProperties(SimonButton _simonButton, bool _isUltraMode = false)
     {
+        if (!_isUltraMode)
+        {
+            SetDefaultIcon();
+        }
         m_buttonValue = _simonButton.m_buttonValue;
         m_defaultButtonSprite = _simonButton.m_defaultButtonSprite;
         m_ButtonWhenPressed = _simonButton.m_defaultButtonSprite;
         InitializeView();
+    }
+
+    public void ToggleUltraEffects(bool _isEnable)
+    {
+        if(m_ultraEffectsAnimator == null)
+        {
+            return;
+        }
+        m_ultraEffects.SetActive(_isEnable);
+        m_ultraEffectsAnimator.SetBool("UltraEffects", _isEnable);
     }
 
     public void SetButtonValue(int _value)
@@ -82,6 +117,7 @@ public class SimonButton : MonoBehaviour
 
     void ButtonHit()
     {
+        Debug.Log("Button hit");
         //Enable button hits when buttons are not animating or it will cause bugs
        // if (!UIManager.Instance.m_startButtonAnimationModeB){
             if (GameManager.instance.SimonButtonHit(m_buttonValue))
@@ -93,6 +129,16 @@ public class SimonButton : MonoBehaviour
                 StartCoroutine(IncorrectButtonPress());
             }
         //}
+    }
+
+    public void SetDefaultIcon()
+    {
+        m_actionImage.sprite = m_defaultIcon;
+    }
+
+    public void SetUltraIcon(Sprite _icon)
+    {
+        m_actionImage.sprite = _icon;
     }
 
     private IEnumerator CorrectButtonPress()

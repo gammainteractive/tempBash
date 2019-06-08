@@ -7,6 +7,18 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
     public List<CustomAnimationTextureModel> m_queuedAnimations;
     private bool m_isQueueMoves = true;
 
+    public delegate void LastAnimationQueueEventHandler();
+
+    public event LastAnimationQueueEventHandler LastAnimationQueueEventHandle;
+
+    public void LastAnimationQueueEvent()
+    {
+        if (LastAnimationQueueEventHandle != null)
+        {
+            LastAnimationQueueEventHandle.Invoke();
+        }
+    }
+
     private void Start()
     {
         m_queuedAnimations = new List<CustomAnimationTextureModel>();
@@ -42,17 +54,12 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
         base.ChangeMaterial(_material);
     }
 
-    public void StopAllAnimations()
-    {
-        StopAllCoroutines();
-    }
-
-    public void Play()
+    public virtual void Play()
     {
         StartCoroutine(IPlay());
     }
 
-    public IEnumerator IPlay()
+    public override IEnumerator IPlay()
     {
         if (m_isQueueMoves)
         {
@@ -60,6 +67,7 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
             {
                 yield return null;
             }
+           
             if(m_queuedAnimations.Count > 0)
             {
                 CustomAnimationTextureModel m_temp = m_queuedAnimations[0];
@@ -76,10 +84,14 @@ public class QueuedAnimatedTiledTexture : AnimateTiledTexture {
         // Start the update tiling coroutine
         f_updateTiling = StartCoroutine(updateTiling());
     }
-    
-    public void StopCurrentAnimation()
+
+    public virtual void StopCurrentAnimation()
     {
         StopCoroutine(f_updateTiling);
     }
-
+    
+    public void StopAllAnimations()
+    {
+        StopAllCoroutines();
+    }
 }

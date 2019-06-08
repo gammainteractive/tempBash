@@ -10,6 +10,7 @@ public class UltraAnimations : AnimationActions {
         ELEPHANT_SPECIAL,
         MONKEY_SPECIAL,
         PENGUIN_SPECIAL,
+        NONE,
     }
 
     public Vector3[] m_ultraPositions;
@@ -40,9 +41,24 @@ public class UltraAnimations : AnimationActions {
         PlayQueued(m_animationRef);
     }
 
-    private void Start()
+    public void PlayUltraAnimations(int _animation)
     {
-       // Test();
+        StartCoroutine(IUltraAnimations(_animation));
+    }
+
+    private IEnumerator IUltraAnimations(int _animation)
+    {
+        while (IsPlaying())
+        {
+            yield return null;
+        }
+        GetComponent<Renderer>().enabled = true;
+        PlayUltra(_animation);
+        while (IsPlaying())
+        {
+            yield return null;
+        }
+        GetComponent<Renderer>().enabled = false;
     }
 
     private void DebugPlay()
@@ -52,4 +68,15 @@ public class UltraAnimations : AnimationActions {
         transform.localPosition = m_ultraPositions[Anim];
         PlayContinuously(Anim);
     }
+
+    public override void StopCurrentAnimation()
+    {
+        StopClearAllAnimation();
+        StopAllAnimations();
+        base.StopCurrentAnimation();
+        PlayQueued((int)ANIMATIONS.NONE);
+        //StopClearAllAnimation();
+    }
+
+
 }

@@ -214,7 +214,7 @@ public class GameManager : MonoBehaviour {
             case GAME_MODES.MODE_A:
                 m_GameMode = (int)GAME_MODES.MODE_A;
 #if UNITY_EDITOR
-                inputTimePerPrompt = 1f;
+                inputTimePerPrompt = 10000f;
 #else
                 inputTimePerPrompt = 1f;
 #endif
@@ -246,7 +246,7 @@ public class GameManager : MonoBehaviour {
             case GAME_MODES.MODE_C:
                 m_GameMode = (int)GAME_MODES.MODE_C;
 #if UNITY_EDITOR
-                inputTimePerPrompt = 1;
+                inputTimePerPrompt = 100000f;
 #else
                 inputTimePerPrompt = 1f;
 #endif
@@ -258,6 +258,7 @@ public class GameManager : MonoBehaviour {
                 SetEnemyHealth(1000);
                 SetEnemyDamage(50);
                 m_healthRegen = 5;
+                m_animationManager.m_mainCharacterAnimationRef.LastAnimationQueueEventHandle += EventProcessResults;
                 uiManager.ShowGameModeView(UIManager.GAME_MODE_VIEW.MODE_A);
                 break;
         }
@@ -414,7 +415,8 @@ public class GameManager : MonoBehaviour {
         yield return new WaitForSeconds(PromptToInputDelay);
         if (m_GameMode == (int)GAME_MODES.MODE_C)
         {
-            uiManager.HideUIPhases();
+            //uiManager.HideUIPhases();
+            uiManager.ShowUIPhase((int)PhasesUI.UI_OBJECTS.MODE_C_REPEAT);
         }
         else
         {
@@ -448,6 +450,7 @@ public class GameManager : MonoBehaviour {
     
     public void RetryLevel()
     {
+        m_animationManager.m_mainCharacterAnimationRef.LastAnimationQueueEventHandle -= EventProcessResults;
         StartGame(m_GameMode);
     }
 
@@ -469,6 +472,7 @@ public class GameManager : MonoBehaviour {
             }
         } else
         {
+            m_isProcessResults = false;
             m_animationManager.MissedInput();
         }
 
@@ -579,7 +583,6 @@ public class GameManager : MonoBehaviour {
                 {
                     float ultraMultiplier = (float)1 / InputsForUltraLevel;
                     AddUltra(ultraMultiplier);
-                    m_animationManager.AddQueuedAnimations(_buttonValue);
                     m_buttonPressesModeC.Add(_buttonValue);
                 } else
                 {
@@ -693,7 +696,6 @@ public class GameManager : MonoBehaviour {
             {
                 StartCoroutine(ProcessResults(false));
             }
-            m_buttonPressesModeC.Clear();
         }
         else
         {
@@ -701,19 +703,28 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    bool m_isProcessResults = true;
 
     private IEnumerator ProcessResults(bool _success)
     {
+        
         uiManager.ActivateTimerBar(false);
         if (_success)
         {
+           // m_isProcessResults = true;
             m_soundManager.PlayCorrectSequence();
             yield return StartCoroutine(ShowResults(true));
             // Correctly entered Sequence
-          //  enemy.TakeHit(ComboMultiplier() * currentInputNum);
+            //  enemy.TakeHit(ComboMultiplier() * currentInputNum);
             for (int i = 0; i < currentInputNum; i++)
             {
-                m_animationManager.PlayQueuedAnimations();
+                MainCharacterAttack(m_buttonPressesModeC[i]);
+                if(i == currentInputNum - 1)
+                {
+                    m_isProcessResults = true;
+                }
+                //  m_animationManager.MainCharacterPlayQueued(m_buttonPressesModeC[0]);
+                //  m_soundManager.MainCharacterAttackTypePlaySound(currentButtonPattern[i].m_buttonValue);
                 enemy.TakeHit(ComboMultiplier());
                 uiManager.HitDamage(ComboMultiplier());
 
@@ -727,30 +738,31 @@ public class GameManager : MonoBehaviour {
                 float ultraMultiplier = (float)1 / InputsForUltraLevel;
                 AddUltra(ultraMultiplier);
 
-                 m_soundManager.MainCharacterAttackTypePlaySound(currentButtonPattern[i].m_buttonValue);
-                //yield return new WaitForSeconds(m_modeCDelayPerAnimation);
+                yield return new WaitForSeconds(m_modeCDelayPerAnimation);  //This is used for the sound to not be played all at once
             }
-          //  m_animationManager.PlayCurrentQueueOnly();
-          //  m_soundManager.MainCharacterAttackTypePlaySound(currentButtonPattern[0].m_buttonValue);
-            /* for(int i = 0; i < currentInputNum; i++)
-             {
-                 m_animationManager.PlayCurrentQueueOnly();
-                 m_soundManager.MainCharacterAttackTypePlaySound(currentButtonPattern[i].m_buttonValue);
-                 while (m_animationManager.GetMainCharacterIsPlaying())
-                 {
-                     yield return null;
-                 }
-             }*/
-
-            yield return new WaitForSeconds(currentInputNum); 
-            UpdateInputTime();
-            UpdatePromptDelay();
-            yield return StartCoroutine(StartPatternWithDelay(currentNumPatterns + 1, false));
         } else
         {
             yield return StartCoroutine(ShowResults(false));
             MissedInput();
         }
+        m_buttonPressesModeC.Clear();
+    }
+
+    private void EventProcessResults()
+    {
+        if (m_GameMode == (int)GAME_MODES.MODE_C && m_isProcessResults)
+        {
+            m_isProcessResults = false;
+            StartCoroutine(IProcessResults());
+        }
+    }
+
+    private IEnumerator IProcessResults()
+    {
+        yield return new WaitForSeconds(1);
+        UpdateInputTime();
+        UpdatePromptDelay();
+        yield return StartCoroutine(StartPatternWithDelay(currentNumPatterns + 1, false));
     }
 
     private IEnumerator ShowResults(bool _isSuccess, float _delay = 2)
@@ -784,18 +796,22 @@ public class GameManager : MonoBehaviour {
 
     public void UltraButtonHit()
     {
-        if (ultraLevel > 0)
+        if (currentState == GameState.PlayerInput)
         {
-            if (currentState != GameState.UltraMode)
+            if (ultraLevel > 0)
             {
-                uiManager.UltraMode(true);
-                ActivateUltraMode();
+                if (currentState != GameState.UltraMode)
+                {
+                    Debug.Log("Ultra Button hit");
+                    uiManager.UltraMode(true);
+                    ActivateUltraMode();
+                    uiManager.UltraEffectsToggle(true);
+                }
             }
-            else
-            {
-                MainCharacterAttackRandomUltra();
-                numUltraHits++;
-            }
+        } else if(currentState == GameState.UltraMode)
+        {
+            MainCharacterAttackRandomUltra();
+            numUltraHits++;
         }
     }
 
@@ -858,6 +874,7 @@ public class GameManager : MonoBehaviour {
                 uiManager.SetUltraButtonInteractable(true);
             } else if(m_GameMode == (int)GAME_MODES.MODE_B)
             {
+                Debug.Log("Ultra mode B");
                 uiManager.UltraMode(true);
                 ActivateUltraMode();
             }
@@ -880,7 +897,20 @@ public class GameManager : MonoBehaviour {
         } else if(m_GameMode == (int)GAME_MODES.MODE_B)
         {
             uiManager.ToggleUltraModeB(true);
+        } else if(m_GameMode == (int)GAME_MODES.MODE_C)
+        {
+            uiManager.HideUIPhases();
         }
+    }
+
+    private IEnumerator IUltraEnded()
+    {
+        uiManager.ShowUltraDamage(true);
+        currentState = GameState.DisplayPattern;
+        yield return new WaitForSeconds(3.0f);
+        uiManager.ShowUltraDamage(false);
+        m_isProcessResults = true;
+        EventProcessResults();
     }
 
     public void UltraEnded()
@@ -896,9 +926,16 @@ public class GameManager : MonoBehaviour {
         {
             if (m_GameMode == (int)GAME_MODES.MODE_C)
             {
-                m_animationManager.PlayQueuedAnimations();
+                 m_animationManager.StopUltraAnimations();
             }
+
             GameOver(true);
+        } else if(m_GameMode == (int)GAME_MODES.MODE_C)
+        {
+            uiManager.UltraEffectsToggle(false);
+            m_animationManager.StopUltraAnimations();
+            m_buttonPressesModeC.Clear();
+            StartCoroutine(IUltraEnded());
         }
         uiManager.SetDamageText(ComboMultiplier(), numUltraHits, totalDamage);
         numUltraHits = 0;
